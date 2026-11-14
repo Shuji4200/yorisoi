@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YORISOI 広報マーケ ダッシュボード</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+:root{--cds-gap-sm:8px;--cds-gap-md:16px;--cds-gap-lg:24px;--cds-pad-md:12px;--cds-pad-lg:20px;--cds-radius:14px;
+ --cds-font-size-caption:12px;--cds-font-size-body:14px;--cds-font-size-heading:18px;--cds-font-size-title:28px;
+ --cds-chart-reference:#9aa0aa;--cds-shadow-popover:0 6px 18px rgba(16,24,40,.12);
+ --color-ok:#1f8a4c;--color-warn:#b25e09;--color-bad:#c4302b;
+ --font-anthropic-sans:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;--font-anthropic-serif:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+html,body{margin:0;background:#f4f5f7}
+body{padding:16px}
+.dash-select{font:inherit;font-size:14px;padding:8px 12px;border:1px solid #e7e9ee;border-radius:10px;background:#fff;color:#16181d}
+.dash-skeleton{display:inline-block;min-width:2em;min-height:1em;border-radius:6px;background:#eceef2}
+.y-snap{max-width:100%;margin:0 0 12px;padding:10px 16px;border-radius:12px;background:#fff7e6;border:1px solid #f3d9a6;color:#6b4d12;font:13px/1.6 "Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+@media (max-width:760px){body{padding:6px}}
+</style>
+</head>
+<body>
+<div class="y-snap">このページは <b>2026/11/14 15:20 時点のスナップショット</b>です（GitHub Pagesに置いた静的版）。Notion・GA4・サーチコンソール・Postizの数字は自動では更新されません。最新はclaude.ai版のダッシュボードを見るか、Claudeに再出力を依頼してください。Wantedlyの候補者名は伏せています。</div>
+<style>
+.y-app{display:flex;gap:var(--cds-gap-lg);align-items:flex-start;font-family:var(--font-anthropic-sans);color:var(--color-fg)}
+.y-nav{flex:0 0 190px;position:sticky;top:0;display:flex;flex-direction:column;gap:2px;padding:var(--cds-pad-md);background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius)}
+.y-brand{display:flex;gap:10px;align-items:center;margin-bottom:var(--cds-gap-md)}
+.y-logo{width:34px;height:34px;border-radius:9px;background:var(--color-fg);color:var(--color-bg);display:grid;place-items:center;font-weight:700}
+.y-brand b{display:block;font-size:var(--cds-font-size-body)}
+.y-brand small{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+.y-navlabel{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin:var(--cds-gap-sm) 6px 2px}
+.y-nav button{all:unset;cursor:pointer;padding:7px 10px;border-radius:8px;font-size:var(--cds-font-size-body);white-space:nowrap}
+.y-nav button:hover{background:var(--color-bg)}
+.y-nav button[aria-current="page"]{background:var(--color-bg);font-weight:600}
+.y-main{flex:1;min-width:0}
+.y-date{color:var(--color-fg-muted);letter-spacing:.08em;font-size:var(--cds-font-size-caption);font-variant-numeric:tabular-nums}
+.y-h1{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:2px 0 6px}
+.y-lede{color:var(--color-fg-muted);margin:0 0 var(--cds-gap-lg);max-width:70ch;line-height:1.7}
+.y-lede b{color:var(--color-fg);font-variant-numeric:tabular-nums}
+.y-h2{font-size:var(--cds-font-size-heading);font-weight:600;margin:var(--cds-gap-lg) 0 var(--cds-gap-sm)}
+.y-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--cds-gap-md)}
+.y-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--cds-gap-md)}
+.y-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);min-width:0}
+.y-card h3{margin:0 0 6px;font-size:var(--cds-font-size-body);font-weight:500;color:var(--color-fg-muted)}
+.y-big{font-family:var(--font-anthropic-serif);font-size:2.4rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.y-unit{font-size:var(--cds-font-size-body);color:var(--color-fg-muted);margin-left:4px}
+.y-bar{height:6px;border-radius:3px;background:var(--color-border-line);margin:10px 0 8px;overflow:hidden}
+.y-bar>i{display:block;height:100%;background:var(--cds-chart-reference,var(--color-fg))}
+.y-sub{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-variant-numeric:tabular-nums}
+.y-ok{color:var(--color-ok)}.y-warn{color:var(--color-warn)}.y-bad{color:var(--color-bad)}
+.y-funnel{display:grid;grid-template-columns:minmax(110px,auto) 1fr 52px 64px;gap:10px 12px;align-items:center;font-size:var(--cds-font-size-body)}
+.y-ftrack{height:26px;border-radius:6px;background:var(--color-bg);overflow:hidden}
+.y-ftrack>i{display:block;height:100%;border-radius:6px}
+.y-fnum{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.y-frate{text-align:right;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);font-variant-numeric:tabular-nums}
+.y-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-top:var(--cds-gap-sm);line-height:1.6}
+.y-todo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.y-todo li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:8px;background:var(--color-bg);font-size:var(--cds-font-size-body)}
+.y-todo li span:last-child{color:var(--color-fg-muted);white-space:nowrap;font-size:var(--cds-font-size-caption)}
+.y-empty{padding:18px;border-radius:8px;background:var(--color-bg);text-align:center;color:var(--color-fg-muted)}
+.y-chart{position:relative;min-height:240px}
+.y-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);box-shadow:var(--cds-shadow-popover);border-radius:8px;padding:6px 9px;font-size:var(--cds-font-size-caption);white-space:nowrap;z-index:2}
+.y-chart .tick text{fill:var(--cds-text-secondary);font-size:var(--cds-font-size-caption)}
+.y-chart .domain,.y-chart .tick line{stroke:var(--cds-chart-axis)}
+.y-legend{display:flex;gap:14px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-bottom:6px}
+.y-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.y-hbars{display:flex;flex-direction:column;gap:8px}
+.y-hrow{display:grid;grid-template-columns:90px 1fr 70px;gap:10px;align-items:center;font-size:var(--cds-font-size-body)}
+.y-hrow .y-ftrack{height:18px}
+.y-tablewrap{overflow-x:auto;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);background:var(--color-panel)}
+.y-table{width:100%;border-collapse:collapse;font-size:var(--cds-font-size-body)}
+.y-table th{text-align:left;font-weight:500;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);padding:9px 10px;border-bottom:1px solid var(--color-border-line);white-space:nowrap;background:var(--color-panel);position:sticky;top:0}
+.y-table td{padding:8px 10px;border-bottom:1px solid var(--color-border-line);vertical-align:top}
+.y-table td.n{text-align:right;font-variant-numeric:tabular-nums}
+.y-table td.w{min-width:240px}
+.y-table a{color:inherit}
+.y-pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);white-space:nowrap}
+.y-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:var(--cds-gap-sm)}
+.y-count{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+.y-axes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--cds-gap-md);align-items:start}
+.y-axis h3{color:var(--color-fg);font-weight:600}
+.y-ilist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.y-ilist li{padding:8px 10px;border-radius:8px;background:var(--color-bg)}
+.y-ilist li.y-go{cursor:pointer}
+.y-ilist li.y-go:hover,.y-ilist li.y-go:focus-visible{outline:1px solid var(--color-border-line)}
+.y-irow{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:var(--cds-font-size-body)}
+.y-ival{white-space:nowrap;font-variant-numeric:tabular-nums;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.y-ival b{font-size:var(--cds-font-size-body);color:var(--color-fg)}
+/* ===== 白テーマ ===== */
+.y-app{--color-fg:#16181d;--color-fg-muted:#8b909a;--color-bg:#f4f5f7;--color-panel:#ffffff;--color-border-line:#e7e9ee;--cds-radius:22px;--cds-text-secondary:#8b909a;--cds-chart-axis:#d9dce3;--cds-chart-grid:#eceef2;--cds-surface-popover:#fff;--cds-border:#e7e9ee;
+  background:#f4f5f7;color:#16181d;gap:0;align-items:stretch;border-radius:18px;overflow:hidden;min-height:720px;font-family:"Hiragino Sans","Noto Sans JP",var(--font-anthropic-sans),sans-serif}
+.y-nav{flex:0 0 250px;background:#fff;border:0;border-right:1px solid #e7e9ee;border-radius:0;padding:0 0 24px;gap:4px;top:0;align-self:stretch}
+.y-brand{padding:22px 20px 18px;margin:0 0 10px;border-bottom:1px solid #e7e9ee;gap:12px}
+.y-logo{width:46px;height:46px;border-radius:12px;background:#16181d;color:#fff;font-size:22px;position:relative}
+.y-logo::after{content:"";position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:#e5484d}
+.y-brand b{font-size:18px;font-weight:800;letter-spacing:.01em;color:#16181d}
+.y-brand small{font-size:12px;color:#8b909a}
+.y-navlabel{margin:14px 22px 4px;font-size:11px;color:#a3a8b1;letter-spacing:.04em}
+.y-nav button{margin:0 10px;padding:11px 14px;border-radius:12px;font-size:15px;color:#3a3f48;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.y-nav button:hover{background:#f4f5f7}
+.y-nav button[aria-current="page"]{background:#eef0f6;color:#2b3557;font-weight:700}
+.y-badge{font-size:13px;color:#8b909a;font-weight:500;font-variant-numeric:tabular-nums}
+.y-main{padding:28px 34px 40px}
+.y-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.y-date{font-size:13px;letter-spacing:.14em;color:#8b909a;font-weight:600}
+.y-h1{font-family:inherit;font-weight:800;font-size:36px;letter-spacing:.02em;margin:4px 0 0;color:#16181d}
+.y-actions{display:flex;gap:12px;flex-wrap:wrap}
+.y-btn{display:inline-flex;align-items:center;gap:6px;padding:13px 22px;border-radius:14px;font-weight:700;font-size:15px;text-decoration:none;border:1px solid #e7e9ee;background:#fff;color:#16181d;cursor:pointer}
+.y-btn.primary{background:#2f3a5f;border-color:#2f3a5f;color:#fff}
+.y-lede{color:#5b606a;margin:10px 0 20px}
+.y-lede b{color:#16181d}
+.y-h2{font-size:19px;font-weight:800;margin:26px 0 12px;color:#16181d}
+.y-h2 small{font-size:13px;font-weight:500;color:#8b909a;margin-left:10px}
+.y-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.y-grid2{gap:22px}
+.y-grid2:has(#funnel){grid-template-columns:1fr}
+.y-card{background:#fff;border:1px solid #e7e9ee;border-radius:22px;padding:26px 28px;box-shadow:0 1px 2px rgba(16,24,40,.03)}
+.y-card h3{font-size:15px;font-weight:500;color:#8b909a;margin:0 0 10px}
+.y-big{font-family:inherit;font-weight:800;font-size:44px;letter-spacing:.01em;color:#16181d}
+.y-unit{font-size:15px;color:#8b909a;margin-left:6px}
+.y-bar{height:7px;border-radius:4px;background:#eceef2;margin:16px 0 14px}
+.y-bar>i{background:#2f3a5f;border-radius:4px}
+.y-sub{font-size:13px;color:#8b909a}
+.y-cardhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.y-cardhead h3{margin:0;font-size:20px;font-weight:800;color:#16181d}
+.y-cardhead h3 small{font-size:14px;font-weight:500;color:#8b909a;margin-left:10px}
+.y-seg{display:inline-flex;border:1px solid #e7e9ee;border-radius:14px;padding:4px;gap:4px;background:#fff}
+.y-seg button{all:unset;cursor:pointer;padding:9px 18px;border-radius:10px;font-size:15px;color:#3a3f48}
+.y-seg button[aria-pressed="true"]{background:#16181d;color:#fff;font-weight:600}
+.y-funnel{grid-template-columns:minmax(120px,auto) 1fr 70px 70px;gap:16px 18px;font-size:16px}
+.y-ftrack{height:40px;border-radius:10px;background:#f4f5f7}
+.y-ftrack>i{border-radius:10px;min-width:4px}
+.y-fnum{font-size:22px;font-weight:800;color:#16181d}
+.y-frate{font-size:14px}
+.y-tablewrap{border-radius:18px;border-color:#e7e9ee;background:#fff}
+.y-table th{background:#fff;color:#8b909a}
+.y-ilist li,.y-todo li{background:#f7f8fa;border-radius:12px}
+.y-axis h3{font-size:16px;font-weight:800;color:#16181d}
+.y-pill{background:#f4f5f7;border-color:#e7e9ee;color:#5b606a}
+@media (max-width:760px){
+ .y-main{padding:18px 14px 28px}
+ .y-nav{flex:none;border-right:0;border-bottom:1px solid #e7e9ee;padding:6px}
+ .y-nav button{margin:0;white-space:nowrap}
+ .y-h1{font-size:28px}
+ .y-big{font-size:36px}
+ .y-app{flex-direction:column}
+ .y-nav{position:static;width:100%;box-sizing:border-box;flex-direction:row;overflow-x:auto}
+ .y-brand,.y-navlabel{display:none}
+ .y-funnel{grid-template-columns:90px 1fr 40px 52px}
+}
+</style>
+<div class="y-app">
+ <nav class="y-nav" id="nav" aria-label="ページ">
+  <div class="y-brand"><div class="y-logo">Y</div><div><b>YORISOI 広報マーケ</b><small>成果・施策・発信の管理</small></div></div>
+  <button data-tab="home" aria-current="page">🏠 ホーム（施策マップ）</button>
+  <div class="y-navlabel">① 法人リード</div>
+  <button data-tab="traffic">📈 HP流入・問い合わせ</button>
+  <button data-tab="sns">💬 SNS（X・Threads・LinkedIn）</button>
+  <button data-tab="pr">📰 PR TIMES</button>
+  <button data-tab="line">💚 公式LINE</button>
+  <div class="y-navlabel">② 商談</div>
+  <button data-tab="deals"><span>🤝 商談一覧</span><span class="y-badge" data-draw="nb-deals"></span></button>
+  <button data-tab="follow"><span>⏰ 要フォロー</span><span class="y-badge" data-draw="nb-follow"></span></button>
+  <div class="y-navlabel">③ ブランディング・採用広報</div>
+  <button data-tab="seo">🔍 検索・HPブログ</button>
+  <button data-tab="wantedly"><span>💼 Wantedly・候補者</span><span class="y-badge" data-draw="nb-wantedly"></span></button>
+  <div class="y-navlabel">⑤ 分析・基盤</div>
+  <button data-tab="activities">🗂️ 施策の実施履歴</button>
+  <button data-tab="analysis">📊 分析レポート</button>
+  <button data-tab="weekly">🗓️ 週次定例</button>
+ </nav>
+
+ <div class="y-main">
+
+ <!-- ホーム -->
+ <section id="home" data-page>
+  <div class="y-head">
+   <div><div class="y-date" data-draw="today">—</div><h1 class="y-h1">ホーム</h1></div>
+   <div class="y-actions">
+    <a class="y-btn" href="#map">🎯 施策マップを見る</a>
+    <a class="y-btn primary" href="https://app.notion.com/p/2b51a43c68ea4b758057553064a5f2bf" target="_blank" rel="noopener">＋ 商談を登録</a>
+   </div>
+  </div>
+  <p class="y-lede">今月の着座は <b data-draw="k-seated">—</b> 件（目標40件・ペース目安 <b data-draw="k-pace">—</b> 件）、25万円以上の契約は <b data-draw="k-won25b">—</b> 件（目標8件）です。<span data-draw="k-verdict"></span></p>
+
+  <h2 class="y-h2" id="goal">ゴールと現在地<small>目標＝月の目標（着座40件・25万円以上の契約8件）</small></h2>
+  <div class="y-grid">
+   <div class="y-card"><h3>② 商談：着座</h3>
+    <div><span class="y-big" data-draw="c-seated">—</span><span class="y-unit">件</span></div>
+    <div class="y-bar"><i data-draw="bar-seated" style="width:0"></i></div>
+    <div class="y-sub">目標 40件 ・ 残り <span data-draw="c-seated-gap">—</span>件</div></div>
+   <div class="y-card"><h3>② 商談：25万円以上の契約（採用くん・送客くん）</h3>
+    <div><span class="y-big" data-draw="c-won25">—</span><span class="y-unit">件</span></div>
+    <div class="y-bar"><i data-draw="bar-won25" style="width:0"></i></div>
+    <div class="y-sub">目標 8件 ・ 残り <span data-draw="c-won25-gap">—</span>件</div></div>
+   <div class="y-card"><h3>② 商談：商談設定</h3>
+    <div><span class="y-big" data-draw="c-meet">—</span><span class="y-unit">件</span></div>
+    <div class="y-bar"><i data-draw="bar-meet" style="width:0"></i></div>
+    <div class="y-sub">先月 <span data-draw="c-meet-prev">—</span>件（月合計）</div></div>
+   <div class="y-card"><h3>① 法人リード：HPフォーム送信（GA4）</h3>
+    <div><span class="y-big" data-draw="c-cv">—</span><span class="y-unit">件</span></div>
+    <div class="y-bar"><i style="width:0"></i></div>
+    <div class="y-sub">セッション <span data-draw="c-sess">—</span> ・ 営業・求職者の送信を含む</div></div>
+   <div class="y-card"><h3>③ ブランディング：Google検索のクリック</h3>
+    <div><span class="y-big" data-draw="c-scclick">—</span><span class="y-unit">回</span></div>
+    <div class="y-bar"><i style="width:0"></i></div>
+    <div class="y-sub">表示 <span data-draw="c-scimp">—</span>回 ・ 先月 <span data-draw="c-scprev">—</span>クリック（月合計）</div></div>
+   <div class="y-card"><h3>① 法人リード：公式LINEの友だち数</h3>
+    <div><span class="y-big" data-draw="l-friends">—</span><span class="y-unit">人</span></div>
+    <div class="y-bar"><i style="width:0"></i></div>
+    <div class="y-sub">今月 <span data-draw="l-add">—</span>人 ・ ターゲットリーチ <span data-draw="l-reach">—</span> ・ ブロック <span data-draw="l-blocks">—</span>（<span data-draw="l-date">—</span>時点）</div></div>
+  </div>
+
+  <h2 class="y-h2" id="map">施策マップ（5軸・24施策の今月の数字）</h2>
+  <div class="y-sub" style="margin-bottom:8px">施策をクリックすると詳細のタブに移ります。「未計測」は、まだデータがつながっていない施策です。</div>
+  <div class="y-axes" data-draw="imap"></div>
+
+  <div class="y-grid2" style="margin-top:var(--cds-gap-md)">
+   <div class="y-card" id="funnel">
+    <div class="y-cardhead"><h3>ファネル<small data-draw="f-summary"></small></h3>
+     <div class="y-seg" role="group" aria-label="期間"><button data-fseg="all" aria-pressed="false">全期間</button><button data-fseg="month" aria-pressed="true">今月</button></div></div>
+    <div class="y-funnel" data-draw="funnel"></div>
+    <div class="y-note">右の%は、ひとつ前の段階からの移行率。フォーム送信はGA4のキーイベントで、営業・求職者も含むため商談設定より大きくなります。商談以降はNotion商談DB（問い合わせ区分＝法人）。</div>
+   </div>
+   <div class="y-card" id="todo"><h3>今日やること（要フォロー） <span class="y-count" data-draw="todo-count">—</span></h3>
+    <ul class="y-todo" data-draw="todo"></ul>
+    <div class="y-note">ルール：着座・提案中は3日・7日・14日後にフォロー。商談日を過ぎて「設定済」のままの行は結果の更新待ち。</div>
+   </div>
+  </div>
+
+  <div class="y-grid2" style="margin-top:var(--cds-gap-md)">
+   <div class="y-card"><h3>週ごとの商談（木曜はじまり・法人）</h3>
+    <div class="y-legend"><span><i data-draw="lg0"></i>商談設定</span><span><i data-draw="lg1"></i>着座</span><span>点線＝週の目安10件</span></div>
+    <div class="y-chart" data-draw="weekchart"></div>
+   </div>
+   <div class="y-card"><h3>流入経路別の商談（今月・法人）</h3>
+    <div class="y-hbars" data-draw="channels"></div>
+    <div class="y-note">流入経路＝最後にHPへ来た経路。「何で知ったか」（認知経路）はまだ未記入の行が多いです。</div>
+   </div>
+  </div>
+ </section>
+
+ <!-- 施策の実施履歴 -->
+ <section id="activities" data-page hidden>
+  <h1 class="y-h1">施策の実施履歴</h1>
+  <p class="y-lede">「いつ・何をやったか」を日付順に並べた履歴です（施策ごとの数字はホームの施策マップ）。Notionの施策ログ、PR TIMESの配信、法人向けSNSの公開投稿（日×アカウントでまとめ）、分析レポートが入ります。</p>
+  <div class="y-grid" style="margin-bottom:var(--cds-gap-md)">
+   <div class="y-card"><h3>今月のPR配信</h3><span class="y-big" data-draw="am-pr">—</span><span class="y-unit">本</span></div>
+   <div class="y-card"><h3>今月のSNS投稿（公開済）</h3><span class="y-big" data-draw="am-sns">—</span><span class="y-unit">件</span></div>
+   <div class="y-card"><h3>今月の施策ログ</h3><span class="y-big" data-draw="am-log">—</span><span class="y-unit">件</span></div>
+   <div class="y-card"><h3>今月の分析レポート</h3><span class="y-big" data-draw="am-an">—</span><span class="y-unit">件</span></div>
+  </div>
+  <div class="y-tools">
+   <select class="dash-select" data-draw="act-purpose" aria-label="目的"></select>
+   <select class="dash-select" data-draw="act-kind" aria-label="種類"></select>
+   <span class="y-count" data-draw="act-count">—</span>
+  </div>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>日付</th><th>種類</th><th>目的</th><th>チャネル</th><th>内容</th><th>詳細・結果</th></tr></thead>
+   <tbody data-draw="act-body"></tbody></table></div>
+ </section>
+
+ <!-- 公式LINE -->
+ <section id="line" data-page hidden>
+  <h1 class="y-h1">公式LINE</h1>
+  <p class="y-lede">【公式】株式会社YORISOI の友だち数は <b data-draw="lt-friends">—</b> 人。今月は <b data-draw="lt-add">—</b> 人、ターゲットリーチ <b data-draw="lt-reach">—</b>、ブロック <b data-draw="lt-block">—</b>。</p>
+  <div class="y-card"><h3>友だち数の推移と日ごとの増加</h3>
+   <div class="y-legend"><span><i data-draw="lg6"></i>友だち数（左軸）</span><span><i data-draw="lg7"></i>前日からの増加（右軸）</span></div>
+   <div class="y-chart" data-draw="linechart"></div></div>
+  <h2 class="y-h2">月別</h2>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>月</th><th>月末の友だち数</th><th>増加</th><th>ターゲットリーチ</th><th>リーチ増加</th><th>ブロック増加</th></tr></thead>
+   <tbody data-draw="line-month-body"></tbody></table></div>
+  <div class="y-note">LINE Official Account Manager（分析＞友だち）から2026/11/14に取得したファイルです（2026/8/1〜11/14）。友だち追加＝これまでの友だち数の累計、ターゲットリーチ＝ブロック等を除いた配信できる人数。</div>
+ </section>
+
+ <!-- 商談一覧 -->
+ <section id="deals" data-page hidden>
+  <h1 class="y-h1">商談一覧</h1>
+  <p class="y-lede">Notion商談DBのうち、商談日が直近45日以降の行（未来の予定を含む）。金額の列は表示していません。</p>
+  <div class="y-tools">
+   <select class="dash-select" data-draw="deal-status" aria-label="ステータス"></select>
+   <select class="dash-select" data-draw="deal-kind" aria-label="問い合わせ区分"></select>
+   <span class="y-count" data-draw="deal-count">—</span>
+  </div>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>商談日時</th><th>会社名</th><th>ステータス</th><th>区分</th><th>流入経路</th><th>検討サービス</th><th>担当</th><th>失注理由</th><th>次回アクション</th></tr></thead>
+   <tbody data-draw="deals-body"></tbody></table></div>
+ </section>
+
+ <!-- 要フォロー -->
+ <section id="follow" data-page hidden>
+  <h1 class="y-h1">要フォロー</h1>
+  <p class="y-lede">着座・提案中で商談から3日以上たった行と、商談日を過ぎても「設定済」のままの行。追客ルールの目安（3・7・14日）を表示します。</p>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>商談日時</th><th>会社名</th><th>ステータス</th><th>経過日数</th><th>やること</th><th>担当</th><th>次回期限</th></tr></thead>
+   <tbody data-draw="follow-body"></tbody></table></div>
+ </section>
+
+ <!-- PR TIMES -->
+ <section id="pr" data-page hidden>
+  <h1 class="y-h1">PR TIMES</h1>
+  <p class="y-lede">PR TIMES管理画面のリリース別レポート（<b data-draw="pr-total">—</b> 本）。記事のPV・訪問者・転載サイト数は 2026/9/1〜11/14 の値、HP流入は今月のGA4（utm_source=prtimes）を記事番号で突き合わせています。</p>
+  <div class="y-grid" style="margin-bottom:var(--cds-gap-md)">
+   <div class="y-card"><h3>記事PV合計（9/1〜11/14・管理画面）</h3><span class="y-big" data-draw="pr-pv">—</span></div>
+   <div class="y-card"><h3>転載サイト数の合計（9/1〜11/14）</h3><span class="y-big" data-draw="pr-rep">—</span></div>
+   <div class="y-card"><h3>PR TIMES経由のセッション（今月）</h3><span class="y-big" data-draw="pr-s">—</span></div>
+   <div class="y-card"><h3>PR TIMES経由のフォーム送信（今月）</h3><span class="y-big" data-draw="pr-c">—</span></div>
+  </div>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>掲載日時</th><th>No.</th><th>タイトル</th><th>PV</th><th>訪問者</th><th>転載</th><th>今月HP流入</th><th>今月フォーム送信</th></tr></thead>
+   <tbody data-draw="pr-body"></tbody></table></div>
+  <div class="y-note">PR TIMES管理画面（分析データ＞レポート＞プレスリリース別レポート）から2026/11/14に取得したファイルです。9月より前の配信もこの期間に見られた分だけ数えます。HP流入・送信は utm_campaign＝p＋記事番号 とみなして集計した推定です。UTM一覧と番号がずれている記事（例：p63⇔p64）があります。</div>
+ </section>
+
+ <!-- SNS -->
+ <section id="sns" data-page hidden>
+  <h1 class="y-h1">SNS投稿</h1>
+  <p class="y-lede">Postizに登録された法人向けアカウントの投稿（2026/11/1〜12/31）。公開済 <b data-draw="sns-pub">—</b> 件・予約 <b data-draw="sns-q">—</b> 件・下書き <b data-draw="sns-d">—</b> 件。</p>
+  <div class="y-grid2" style="margin-bottom:var(--cds-gap-md)">
+   <div class="y-card"><h3>アカウント別の投稿数</h3>
+    <div class="y-tablewrap" style="border:0"><table class="y-table">
+     <thead><tr><th>アカウント</th><th>公開済</th><th>予約</th><th>下書き</th></tr></thead>
+     <tbody data-draw="sns-acc-body"></tbody></table></div></div>
+   <div class="y-card"><h3>プロフィールUTM経由のHP流入（今月・GA4）</h3>
+    <div class="y-tablewrap" style="border:0"><table class="y-table">
+     <thead><tr><th>utm_source</th><th>セッション</th><th>フォーム送信</th></tr></thead>
+     <tbody data-draw="sns-utm-body"></tbody></table></div>
+    <div class="y-note">計測ルール：SNSは投稿ごとではなくプロフィール欄のUTMでアカウント単位に計測。Xの閲覧数（インプレッション）は未接続です。</div></div>
+  </div>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>投稿日時</th><th>アカウント</th><th>状態</th><th>冒頭</th></tr></thead>
+   <tbody data-draw="sns-body"></tbody></table></div>
+ </section>
+
+ <!-- 流入 -->
+ <section id="traffic" data-page hidden>
+  <h1 class="y-h1">流入（GA4）</h1>
+  <p class="y-lede">yorisoi-hr.com の直近60日のセッションとフォーム送信（キーイベント）。</p>
+  <div class="y-card"><h3>日別セッションとフォーム送信</h3>
+   <div class="y-legend"><span><i data-draw="lg2"></i>セッション</span><span><i data-draw="lg3"></i>フォーム送信</span></div>
+   <div class="y-chart" data-draw="gachart"></div></div>
+  <h2 class="y-h2">チャネル別（今月）</h2>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>チャネル</th><th>セッション</th><th>フォーム送信</th></tr></thead>
+   <tbody data-draw="ga-ch-body"></tbody></table></div>
+ </section>
+
+ <!-- 検索 -->
+ <section id="seo" data-page hidden>
+  <h1 class="y-h1">検索（SEO）</h1>
+  <p class="y-lede">Googleサーチコンソール（yorisoi-hr.com）。今月のクリック <b data-draw="seo-c">—</b> 回・表示 <b data-draw="seo-i">—</b> 回。サーチコンソールは2〜3日遅れて反映されます。</p>
+  <div class="y-card"><h3>日別のクリックと表示（直近60日）</h3>
+   <div class="y-legend"><span><i data-draw="lg4"></i>表示回数</span><span><i data-draw="lg5"></i>クリック</span></div>
+   <div class="y-chart" data-draw="scchart"></div></div>
+  <h2 class="y-h2">検索キーワード（直近28日・表示5回以上）</h2>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>キーワード</th><th>種類</th><th>クリック</th><th>表示</th><th>平均順位</th></tr></thead>
+   <tbody data-draw="sc-body"></tbody></table></div>
+  <div class="y-note">種類は、社名・サービス名を含むものを「指名」、それ以外を「一般」として自動で分けています（送客・採用代行などの一般キーワードが、新しい法人リードの入口です）。</div>
+ </section>
+
+ <!-- Wantedly -->
+ <section id="wantedly" data-page hidden>
+  <h1 class="y-h1">Wantedly・候補者</h1>
+  <p class="y-lede">Wantedly管理画面（株式会社YORISOI）の直近30日。応募 <b data-draw="w-applies">—</b> 件・スカウト <b data-draw="w-scouts">—</b> 件。候補者は未対応 <b data-draw="w-unhandled">—</b> 人・対応中 <b data-draw="w-progress">—</b> 人です。</p>
+  <div class="y-grid" style="margin-bottom:var(--cds-gap-md)">
+   <div class="y-card"><h3>募集のPV（直近30日）</h3><span class="y-big" data-draw="w-pv">—</span></div>
+   <div class="y-card"><h3>会社ランキング</h3><span class="y-big" data-draw="w-rank">—</span><span class="y-unit">位</span>
+    <div class="y-sub">全 <span data-draw="w-rank-total">—</span> 社中</div></div>
+   <div class="y-card"><h3>公開中のストーリー</h3><span class="y-big" data-draw="w-st-count">—</span><span class="y-unit">本</span>
+    <div class="y-sub">PV合計 <span data-draw="w-st-pv">—</span></div></div>
+  </div>
+  <h2 class="y-h2">候補者</h2>
+  <div class="y-tools"><select class="dash-select" data-draw="cand-status" aria-label="状態"></select></div>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>応募日</th><th>候補者</th><th>年齢</th><th>現職種</th><th>応募した募集</th><th>状態</th><th>メモ</th></tr></thead>
+   <tbody data-draw="cand-body"></tbody></table></div>
+  <div class="y-note">公開ページのため、候補者名は番号に置き換えています。応募日は一覧の「n日前」から2026/11/14を基準に計算した日付です。対応はWantedlyの管理画面で行ってください。</div>
+  <h2 class="y-h2">募集</h2>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>職種</th><th>募集タイトル</th><th>状態</th><th>最終編集</th><th>PV</th><th>応援</th><th>応募</th></tr></thead>
+   <tbody data-draw="wproj-body"></tbody></table></div>
+  <h2 class="y-h2">ストーリー</h2>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>公開日</th><th>タイトル</th><th>著者</th><th>PV</th><th>いいね</th></tr></thead>
+   <tbody data-draw="wstory-body"></tbody></table></div>
+ </section>
+
+ <!-- 分析 -->
+ <section id="analysis" data-page hidden>
+  <h1 class="y-h1">分析レポート</h1>
+  <p class="y-lede">Notion「分析レポート」。結論と次のアクション。</p>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>分析日</th><th>タイトル</th><th>目的</th><th>ステータス</th><th>結論</th><th>次のアクション</th></tr></thead>
+   <tbody data-draw="analysis-body"></tbody></table></div>
+ </section>
+
+ <!-- 週次 -->
+ <section id="weekly" data-page hidden>
+  <h1 class="y-h1">週次定例</h1>
+  <p class="y-lede">Notion「週次定例レポート」。件数のみ（金額は扱いません）。</p>
+  <div class="y-tablewrap"><table class="y-table">
+   <thead><tr><th>定例日</th><th>タイトル</th><th>対象期間</th><th>商談設定</th><th>着座</th><th>今月の着座累計</th><th>成約</th><th>ステータス</th></tr></thead>
+   <tbody data-draw="weekly-body"></tbody></table></div>
+ </section>
+
+ </div>
+</div>
+
+<script src="data.js"></script>
+<script src="runtime.js"></script>
+<script src="base.js"></script>
+<script src="notion.js"></script>
+<script src="calc.js"></script>
+<script src="nav.js"></script>
+<script src="home.js"></script>
+<script src="lists.js"></script>
+<script src="extra.js"></script>
+<script src="wantedly.js"></script>
+<script src="map.js"></script>
+<script src="ui.js"></script>
+<script>dash.drawAll();</script>
+</body>
+</html>
