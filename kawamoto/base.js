@@ -1,6 +1,7 @@
 // ---------- 定数（目標） ----------
 window.YT = {SEATED: 40, WON25: 8, MEET_WEEK: 10};
 window.Y = {
+  PILL: {'成約': 'ok', '着座': 'info', '提案中': 'warn', '設定済': 'plain', '失注': 'mute', '未対応': 'bad', 'PUBLISHED': 'ok', 'QUEUE': 'info', 'DRAFT': 'mute', '募集中': 'ok', '一般': 'warn', '指名': 'plain'},
   jstNow: () => new Date(Date.now() + 9 * 3600e3),
   ym: () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 7),
   num: (v) => (v == null || v === '' ? 0 : +v),
@@ -37,7 +38,7 @@ window.Y = {
           const a = document.createElement('a'); a.href = r[c.link]; a.target = '_blank'; a.rel = 'noopener';
           a.textContent = v ?? '（無題）'; td.append(a);
         } else if (c.pill) {
-          if (v) { const s = document.createElement('span'); s.className = 'y-pill'; s.textContent = v; td.append(s); }
+          if (v) { const s = document.createElement('span'); const k = Y.PILL[v] || (String(v).startsWith('対応中') ? 'info' : ''); s.className = 'y-pill' + (k ? ' p-' + k : ''); s.textContent = v; td.append(s); }
         } else if (c.list) {
           let arr = []; try { arr = JSON.parse(v || '[]'); } catch (e) { arr = v ? [v] : []; }
           td.textContent = arr.join('・');

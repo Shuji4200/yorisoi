@@ -149,11 +149,51 @@ body{padding:16px}
  .y-brand,.y-navlabel{display:none}
  .y-funnel{grid-template-columns:90px 1fr 40px 52px}
 }
+.y-nalist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.y-na{padding:12px 14px;border-radius:12px;background:#f7f8fa;display:flex;flex-direction:column;gap:4px}
+.y-na.y-go{cursor:pointer}.y-na.y-go:hover{outline:1px solid #e7e9ee}
+.y-na-top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:14px;line-height:1.6}
+.y-na-top b{font-weight:600;color:#16181d;flex:1;min-width:200px}
+.y-na-pri{font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.y-na-3{background:#fde8e8;color:#b42318}.y-na-2{background:#fef3e2;color:#a15c07}.y-na-1{background:#eef0f6;color:#4a5578}
+/* ===== 見やすさ改善 ===== */
+.y-main{max-width:1280px}
+.y-nav button[aria-current="page"]{box-shadow:inset 3px 0 0 #2f3a5f}
+.y-h2{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.y-h2 small{margin-left:0}
+.y-goal{grid-template-columns:repeat(3,minmax(0,1fr))}
+.y-goal .y-card{position:relative;overflow:hidden}
+.y-goal .y-card::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:#2f3a5f}
+.y-goal .y-card:nth-child(2)::before{background:#22a06b}
+.y-goal .y-card:nth-child(3)::before{background:#8b5cf6}
+.y-chs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.y-ch{all:unset;box-sizing:border-box;cursor:pointer;background:#fff;border:1px solid #e7e9ee;border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,box-shadow .15s}
+.y-ch:hover,.y-ch:focus-visible{border-color:#c9cedb;box-shadow:0 4px 14px rgba(16,24,40,.06)}
+.y-ch-head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#3a3f48}
+.y-ch-tag{font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;background:#eef0f6;color:#4a5578;white-space:nowrap}
+.y-ch-tag.hot{background:#fde8e8;color:#b42318}
+.y-ch-label{font-size:12px;color:#8b909a;margin-top:6px}
+.y-ch-val b{font-size:28px;font-weight:800;color:#16181d;font-variant-numeric:tabular-nums}
+.y-ch-val span{font-size:13px;color:#8b909a;margin-left:4px}
+.y-linkbtn{all:unset;cursor:pointer;font-size:13px;font-weight:600;color:#2f3a5f;padding:6px 12px;border-radius:10px;border:1px solid #e7e9ee;background:#fff}
+.y-linkbtn:hover{background:#f4f5f7}
+.y-pill.p-ok{background:#e7f6ee;border-color:#c5ead6;color:#1f7a4c}
+.y-pill.p-info{background:#eaf1fe;border-color:#cddcfb;color:#2752b8}
+.y-pill.p-warn{background:#fef3e2;border-color:#f7dcb0;color:#a15c07}
+.y-pill.p-bad{background:#fde8e8;border-color:#f6c9c6;color:#b42318}
+.y-pill.p-mute{background:#f1f2f4;border-color:#e2e4e8;color:#8b909a}
+.y-pill.p-plain{background:#f4f5f7;border-color:#e7e9ee;color:#5b606a}
+.y-table tbody tr:hover td{background:#fafbfc}
+.y-table td{line-height:1.6}
+.y-tablewrap{max-height:640px;overflow:auto}
+.y-section-gap{height:8px}
+@media (max-width:900px){.y-goal{grid-template-columns:1fr}}
 </style>
 <div class="y-app">
  <nav class="y-nav" id="nav" aria-label="ページ">
   <div class="y-brand"><div class="y-logo">Y</div><div><b>YORISOI 広報マーケ</b><small>成果・施策・発信の管理</small></div></div>
   <button data-tab="home" aria-current="page">🏠 ホーム（施策マップ）</button>
+  <button data-tab="actions"><span>✅ ネクストアクション</span><span class="y-badge" data-draw="nb-na"></span></button>
   <div class="y-navlabel">① 法人リード</div>
   <button data-tab="traffic">📈 HP流入・問い合わせ</button>
   <button data-tab="sns">💬 SNS（X・Threads・LinkedIn）</button>
@@ -185,7 +225,7 @@ body{padding:16px}
   <p class="y-lede">今月の着座は <b data-draw="k-seated">—</b> 件（目標40件・ペース目安 <b data-draw="k-pace">—</b> 件）、送客くん・採用くんの成約は <b data-draw="k-won25b">—</b> 件（目標8件）です。<span data-draw="k-verdict"></span></p>
 
   <h2 class="y-h2" id="goal">ゴールと現在地<small>目標＝月の目標（着座40件・送客くん・採用くんの成約8件）</small></h2>
-  <div class="y-grid">
+  <div class="y-grid y-goal">
    <div class="y-card"><h3>② 商談：着座</h3>
     <div><span class="y-big" data-draw="c-seated">—</span><span class="y-unit">件</span></div>
     <div class="y-bar"><i data-draw="bar-seated" style="width:0"></i></div>
@@ -198,23 +238,14 @@ body{padding:16px}
     <div><span class="y-big" data-draw="c-meet">—</span><span class="y-unit">件</span></div>
     <div class="y-bar"><i data-draw="bar-meet" style="width:0"></i></div>
     <div class="y-sub">先月 <span data-draw="c-meet-prev">—</span>件（月合計）</div></div>
-   <div class="y-card"><h3>① 法人リード：HPフォーム送信（GA4）</h3>
-    <div><span class="y-big" data-draw="c-cv">—</span><span class="y-unit">件</span></div>
-    <div class="y-bar"><i style="width:0"></i></div>
-    <div class="y-sub">セッション <span data-draw="c-sess">—</span> ・ 営業・求職者の送信を含む</div></div>
-   <div class="y-card"><h3>③ ブランディング：Google検索のクリック</h3>
-    <div><span class="y-big" data-draw="c-scclick">—</span><span class="y-unit">回</span></div>
-    <div class="y-bar"><i style="width:0"></i></div>
-    <div class="y-sub">表示 <span data-draw="c-scimp">—</span>回 ・ 先月 <span data-draw="c-scprev">—</span>クリック（月合計）</div></div>
-   <div class="y-card"><h3>① 法人リード：公式LINEの友だち数</h3>
-    <div><span class="y-big" data-draw="l-friends">—</span><span class="y-unit">人</span></div>
-    <div class="y-bar"><i style="width:0"></i></div>
-    <div class="y-sub">今月 <span data-draw="l-add">—</span>人 ・ ターゲットリーチ <span data-draw="l-reach">—</span> ・ ブロック <span data-draw="l-blocks">—</span>（<span data-draw="l-date">—</span>時点）</div></div>
   </div>
 
-  <h2 class="y-h2" id="map">施策マップ（5軸・24施策の今月の数字）</h2>
-  <div class="y-sub" style="margin-bottom:8px">施策をクリックすると詳細のタブに移ります。「未計測」は、まだデータがつながっていない施策です。</div>
-  <div class="y-axes" data-draw="imap"></div>
+  <h2 class="y-h2" id="channels">チャネル別の今月<small>クリックで詳細タブへ</small></h2>
+  <div class="y-chs" data-draw="chstrip"></div>
+
+  <h2 class="y-h2" id="next"><span>ネクストアクション <small>優先度順・上位5件</small></span><button class="y-linkbtn" data-go="actions">すべて見る →</button></h2>
+  <div class="y-card"><ul class="y-nalist" data-draw="na-home" data-limit="5"></ul><div class="y-note">事実欄はGA4・Notion・Postiz・PR TIMES・LINE・Wantedlyの実データ、アクション欄はルールによる提案です。高＝今月の着座・成約に直結／中＝来月以降のリード／低＝計測・整備。</div></div>
+
 
   <div class="y-grid2" style="margin-top:var(--cds-gap-md)">
    <div class="y-card" id="funnel">
@@ -239,6 +270,17 @@ body{padding:16px}
     <div class="y-note">流入経路＝最後にHPへ来た経路。「何で知ったか」（認知経路）はまだ未記入の行が多いです。</div>
    </div>
   </div>
+
+  <h2 class="y-h2" id="map">施策マップ<small>5軸・24施策の今月の数字（クリックで詳細タブへ・「未計測」はデータ未接続）</small></h2>
+  <div class="y-axes" data-draw="imap"></div>
+ </section>
+
+
+ <!-- ネクストアクション -->
+ <section id="actions" data-page hidden>
+  <h1 class="y-h1">ネクストアクション</h1>
+  <p class="y-lede">HP・SNS・PR TIMES・公式LINE・商談・検索・Wantedlyの実データをルールに当てはめて、次にやることを優先度順に並べています。事実欄は実データ、アクション欄は提案です。</p>
+  <div class="y-card"><ul class="y-nalist" data-draw="na-all"></ul></div>
  </section>
 
  <!-- 施策の実施履歴 -->
@@ -265,6 +307,7 @@ body{padding:16px}
  <section id="line" data-page hidden>
   <h1 class="y-h1">公式LINE</h1>
   <p class="y-lede">【公式】株式会社YORISOI の友だち数は <b data-draw="lt-friends">—</b> 人。今月は <b data-draw="lt-add">—</b> 人、ターゲットリーチ <b data-draw="lt-reach">—</b>、ブロック <b data-draw="lt-block">—</b>。</p>
+  <div class="y-card" style="margin-bottom:var(--cds-gap-md)"><h3>ネクストアクション（公式LINE）</h3><ul class="y-nalist" data-draw="na-3" data-ch="公式LINE"></ul><div class="y-note">事実は実データ、アクションはルールによる提案です。</div></div>
   <div class="y-card"><h3>友だち数の推移と日ごとの増加</h3>
    <div class="y-legend"><span><i data-draw="lg6"></i>友だち数（左軸）</span><span><i data-draw="lg7"></i>前日からの増加（右軸）</span></div>
    <div class="y-chart" data-draw="linechart"></div></div>
@@ -279,6 +322,7 @@ body{padding:16px}
  <section id="deals" data-page hidden>
   <h1 class="y-h1">商談一覧</h1>
   <p class="y-lede">Notion商談DBのうち、商談日が直近45日以降の行（未来の予定を含む）。金額の列は表示していません。</p>
+  <div class="y-card" style="margin-bottom:var(--cds-gap-md)"><h3>ネクストアクション（商談）</h3><ul class="y-nalist" data-draw="na-4" data-ch="商談"></ul><div class="y-note">事実は実データ、アクションはルールによる提案です。</div></div>
   <div class="y-tools">
    <select class="dash-select" data-draw="deal-status" aria-label="ステータス"></select>
    <select class="dash-select" data-draw="deal-kind" aria-label="問い合わせ区分"></select>
@@ -302,6 +346,7 @@ body{padding:16px}
  <section id="pr" data-page hidden>
   <h1 class="y-h1">PR TIMES</h1>
   <p class="y-lede">PR TIMES管理画面のリリース別レポート（<b data-draw="pr-total">—</b> 本）。記事のPV・訪問者・転載サイト数は 2026/9/1〜11/14 の値、HP流入は今月のGA4（utm_source=prtimes）を記事番号で突き合わせています。</p>
+  <div class="y-card" style="margin-bottom:var(--cds-gap-md)"><h3>ネクストアクション（PR TIMES）</h3><ul class="y-nalist" data-draw="na-2" data-ch="PR TIMES"></ul><div class="y-note">事実は実データ、アクションはルールによる提案です。</div></div>
   <div class="y-grid" style="margin-bottom:var(--cds-gap-md)">
    <div class="y-card"><h3>記事PV合計（9/1〜11/14・管理画面）</h3><span class="y-big" data-draw="pr-pv">—</span></div>
    <div class="y-card"><h3>転載サイト数の合計（9/1〜11/14）</h3><span class="y-big" data-draw="pr-rep">—</span></div>
@@ -318,6 +363,7 @@ body{padding:16px}
  <section id="sns" data-page hidden>
   <h1 class="y-h1">SNS投稿</h1>
   <p class="y-lede">Postizに登録された法人向けアカウントの投稿（2026/11/1〜12/31）。公開済 <b data-draw="sns-pub">—</b> 件・予約 <b data-draw="sns-q">—</b> 件・下書き <b data-draw="sns-d">—</b> 件。</p>
+  <div class="y-card" style="margin-bottom:var(--cds-gap-md)"><h3>ネクストアクション（SNS）</h3><ul class="y-nalist" data-draw="na-1" data-ch="SNS"></ul><div class="y-note">事実は実データ、アクションはルールによる提案です。</div></div>
   <div class="y-grid2" style="margin-bottom:var(--cds-gap-md)">
    <div class="y-card"><h3>アカウント別の投稿数</h3>
     <div class="y-tablewrap" style="border:0"><table class="y-table">
@@ -338,6 +384,7 @@ body{padding:16px}
  <section id="traffic" data-page hidden>
   <h1 class="y-h1">流入（GA4）</h1>
   <p class="y-lede">yorisoi-hr.com の直近60日のセッションとフォーム送信（キーイベント）。</p>
+  <div class="y-card" style="margin-bottom:var(--cds-gap-md)"><h3>ネクストアクション（HP）</h3><ul class="y-nalist" data-draw="na-0" data-ch="HP"></ul><div class="y-note">事実は実データ、アクションはルールによる提案です。</div></div>
   <div class="y-card"><h3>日別セッションとフォーム送信</h3>
    <div class="y-legend"><span><i data-draw="lg2"></i>セッション</span><span><i data-draw="lg3"></i>フォーム送信</span></div>
    <div class="y-chart" data-draw="gachart"></div></div>
@@ -351,6 +398,7 @@ body{padding:16px}
  <section id="seo" data-page hidden>
   <h1 class="y-h1">検索（SEO）</h1>
   <p class="y-lede">Googleサーチコンソール（yorisoi-hr.com）。今月のクリック <b data-draw="seo-c">—</b> 回・表示 <b data-draw="seo-i">—</b> 回。サーチコンソールは2〜3日遅れて反映されます。</p>
+  <div class="y-card" style="margin-bottom:var(--cds-gap-md)"><h3>ネクストアクション（検索）</h3><ul class="y-nalist" data-draw="na-5" data-ch="検索"></ul><div class="y-note">事実は実データ、アクションはルールによる提案です。</div></div>
   <div class="y-card"><h3>日別のクリックと表示（直近60日）</h3>
    <div class="y-legend"><span><i data-draw="lg4"></i>表示回数</span><span><i data-draw="lg5"></i>クリック</span></div>
    <div class="y-chart" data-draw="scchart"></div></div>
@@ -365,6 +413,7 @@ body{padding:16px}
  <section id="wantedly" data-page hidden>
   <h1 class="y-h1">Wantedly・候補者</h1>
   <p class="y-lede">Wantedly管理画面（株式会社YORISOI）の直近30日。応募 <b data-draw="w-applies">—</b> 件・スカウト <b data-draw="w-scouts">—</b> 件。候補者は未対応 <b data-draw="w-unhandled">—</b> 人・対応中 <b data-draw="w-progress">—</b> 人です。</p>
+  <div class="y-card" style="margin-bottom:var(--cds-gap-md)"><h3>ネクストアクション（Wantedly）</h3><ul class="y-nalist" data-draw="na-6" data-ch="Wantedly"></ul><div class="y-note">事実は実データ、アクションはルールによる提案です。</div></div>
   <div class="y-grid" style="margin-bottom:var(--cds-gap-md)">
    <div class="y-card"><h3>募集のPV（直近30日）</h3><span class="y-big" data-draw="w-pv">—</span></div>
    <div class="y-card"><h3>会社ランキング</h3><span class="y-big" data-draw="w-rank">—</span><span class="y-unit">位</span>
@@ -421,6 +470,8 @@ body{padding:16px}
 <script src="wantedly.js"></script>
 <script src="map.js"></script>
 <script src="ui.js"></script>
+<script src="actions.js"></script>
+<script src="ux.js"></script>
 <script>dash.drawAll();</script>
 </body>
 </html>
