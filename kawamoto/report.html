@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>YORISOI 広報マーケ 月次レポート</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+html,body{margin:0;background:#fff}body{padding:16px}
+.y-wrap{font:14px/1.6 "Hiragino Sans","Noto Sans JP",system-ui,sans-serif;color:#16181d;max-width:1100px;margin:0 auto;padding:4px}
+.y-wrap{background:#fff;border-radius:20px}
+.y-r-hero{background:#fff;color:#16181d;border:1px solid #e7e9ee;border-top:4px solid #22a06b;border-radius:18px;padding:22px 26px;margin-bottom:16px}
+.y-r-hero .y-h1{color:#16181d;margin:4px 0 6px;font-size:28px;font-weight:800}
+.y-r-hero p{margin:0;color:#5b606a;font-size:14px}
+.y-r-kicker{font-size:11px;letter-spacing:.12em;color:#22a06b;font-weight:700}
+.y-asof{margin:0 0 12px;padding:10px 14px;border-radius:12px;background:#fff7e6;border:1px solid #f3d9a6;color:#6b4d12;font-size:13px}
+.y-r-months{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 6px;padding:12px 14px;background:#fff;border:1px solid #e7e9ee;border-radius:16px}
+.y-r-months button{border:1px solid #e1e4ea;background:#fff;border-radius:999px;padding:7px 16px;font-size:14px;cursor:pointer;color:#16181d;font-family:inherit}
+.y-r-months button[aria-pressed=true]{background:#22a06b;border-color:#22a06b;color:#fff;font-weight:700}
+.y-r-year{font-weight:800;margin:0 4px 0 2px;color:#5b606a}
+.y-h2{font-size:18px;font-weight:800;margin:22px 0 8px;display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+.y-h2 small{font-size:12px;font-weight:400;color:#8b909a}
+.y-lede{margin:0 0 12px;color:#5b606a}
+.y-warn{color:#b25e09;font-weight:700}.y-ok{color:#1f8a4c;font-weight:700}
+.y-card{background:#fff;border:1px solid #e7e9ee;border-radius:16px;padding:18px 20px}
+.y-sub{font-size:12px;color:#8b909a}
+.y-r-ph{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.y-r-ph b{font-size:18px}
+.y-r-days{flex:0 1 360px;min-width:220px;font-size:13px;color:#5b606a}
+.y-bar{height:10px;border-radius:999px;background:#eceef2;position:relative;margin:6px 0 0}
+.y-bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:#9aa0aa}
+.y-r-pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.y-r-pc{border:1px solid #e7e9ee;border-radius:16px;padding:16px}
+.y-r-pc .y-bar{margin:12px 0}
+.y-r-pc .y-bar>i{background:#22a06b}
+.y-r-pc .y-bar>em{position:absolute;top:-5px;bottom:-5px;width:2px;background:#16181d;border-radius:1px}
+.y-pks{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.y-pk{border-radius:16px;padding:14px 16px;background:#fff;border:1px solid #e7e9ee;border-left:5px solid #9aa0aa}
+.y-pk-l{font-size:12px;font-weight:700;color:#5b606a}
+.y-pk-v b{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+.y-pk-v span{font-size:13px;color:#8b909a;margin-left:4px}
+.y-pk.t-blue{border-left-color:#3b82f6}.y-pk.t-purple{border-left-color:#8b5cf6}
+.y-pk.t-orange{border-left-color:#f59e0b}.y-pk.t-green{border-left-color:#22a06b}
+.y-pk.t-teal{border-left-color:#0ea5a4}.y-pk.t-navy{border-left-color:#2f3a5f}
+.y-asof{background:#f6f7f9!important;border-color:#e7e9ee!important;color:#5b606a!important}
+.y-r-tags,.y-r-dl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.y-r-dl{margin:6px 0 4px}
+.y-r-tag,.y-r-delta{font-size:12px;border-radius:999px;padding:3px 10px;background:#f1f3f6;color:#5b606a;font-weight:700}
+.y-r-tag.t-ok,.y-r-delta.t-up{background:#e6f6ee;color:#167a4f}
+.y-r-tag.t-warn,.y-r-delta.t-down{background:#fdecec;color:#c0392b}
+.y-tablewrap{overflow-x:auto;background:#fff;border:1px solid #e7e9ee;border-radius:16px}
+.y-table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+.y-table th{background:#f6f7f9;text-align:left;padding:9px 12px;font-size:12px;color:#5b606a}
+.y-table td{padding:9px 12px;border-top:1px solid #eef0f3}
+.y-table td.n{text-align:right;font-variant-numeric:tabular-nums}
+.y-table tr.y-go{cursor:pointer}.y-table tr.y-go:hover td{background:#f8faf9}
+.y-table tr.y-r-sel td{background:#eef7f2;font-weight:700}
+.y-note{margin-top:16px;font-size:12px;color:#8b909a;line-height:1.7}
+</style>
+</head><body>
+
+<div class="y-wrap">
+ <div class="y-r-hero" id="hero">
+  <div class="y-r-kicker">YORISOI 広報・マーケ｜週次MTG用</div>
+  <h1 class="y-h1">月次レポート</h1>
+  <p>商談・HP・検索・SNS・PR TIMES・公式LINEの数字を月ごとにまとめています。月を選ぶと切り替わります。</p>
+ </div>
+ <div class="y-asof" id="asof">2026年11月17日 12:30時点の集計です。毎週の定例前に最新化します。</div>
+ <div class="y-r-months" id="months" role="group" aria-label="月" data-draw="r-months" data-source="pstats"></div>
+ <h2 class="y-h2" id="summary" data-draw="r-title">—</h2>
+ <p class="y-lede" data-draw="r-lede">—</p>
+ <div class="y-card" id="progress" data-draw="r-progress" data-source="pstats"></div>
+ <h2 class="y-h2" id="channels">チャネル別の数字<small>▲▼は前月比（今月は先月の同じ日までと比較）</small></h2>
+ <div class="y-pks" data-draw="r-cards" data-source="pstats"></div>
+ <h2 class="y-h2" id="trend">月別の推移<small>行をクリックするとその月に切り替わります</small></h2>
+ <div data-draw="r-trend" data-source="pstats"></div>
+ <div class="y-note" id="notes">目標：着座 月40件、送客くん・採用くんの成約 月8件（金額は問わない）。商談・成約はNotion商談DB（法人）で、着座・商談設定は商談日の月、成約は成約日の月で数えます。HP・SNS・PR TIMESの流入はGA4（9/15から計測）、検索はサーチコンソール（直近2〜3日は未反映）です。SNSの公開投稿数・PR TIMESの配信本数・公式LINEの友だち増加は、各管理画面から11/14に取得した値です。金額・報酬は載せていません。</div>
+</div>
+
+<script>window.YDATA={"rows": [{"period": "m0", "kind": "month", "start": "2026-11-01", "end": "2026-11-17", "title": "2026年11月", "days": 17, "full_days": 30, "current": true, "meetings": 24, "seated": 15, "lost": 1, "won": 3, "won25": 3, "target_seated": 40, "target_won": 8, "sessions": 823, "cv": 89, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 202, "impressions": 2002, "sns_sessions": 65, "sns_cv": 2, "pr_sessions": 84, "pr_cv": 9, "sns_pub": 72, "pr": 16, "line_add": 7, "line_block_add": 1, "line_until": "2026-11-14"}, {"period": "m1", "kind": "month", "start": "2026-10-01", "end": "2026-10-31", "title": "2026年10月", "days": 31, "full_days": 31, "current": false, "meetings": 33, "seated": 32, "lost": 4, "won": 1, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": 1532, "cv": 174, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 452, "impressions": 2889, "sns_sessions": 141, "sns_cv": 8, "pr_sessions": 103, "pr_cv": 10, "sns_pub": 0, "pr": 15, "line_add": 15, "line_block_add": 2, "line_until": "2026-10-31"}, {"period": "m2", "kind": "month", "start": "2026-09-01", "end": "2026-09-30", "title": "2026年9月", "days": 30, "full_days": 30, "current": false, "meetings": 37, "seated": 34, "lost": 6, "won": 6, "won25": 6, "target_seated": 40, "target_won": 8, "sessions": 809, "cv": 57, "ga_from": "2026-09-15", "ga_partial": true, "clicks": 531, "impressions": 3728, "sns_sessions": 13, "sns_cv": 0, "pr_sessions": 44, "pr_cv": 4, "sns_pub": 0, "pr": 1, "line_add": 29, "line_block_add": 5, "line_until": "2026-09-30"}, {"period": "m3", "kind": "month", "start": "2026-08-01", "end": "2026-08-31", "title": "2026年8月", "days": 31, "full_days": 31, "current": false, "meetings": 21, "seated": 21, "lost": 6, "won": 6, "won25": 5, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 371, "impressions": 3207, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 24, "line_add": 13, "line_block_add": 3, "line_until": "2026-08-31"}, {"period": "m4", "kind": "month", "start": "2026-07-01", "end": "2026-07-31", "title": "2026年7月", "days": 31, "full_days": 31, "current": false, "meetings": 6, "seated": 4, "lost": 0, "won": 4, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 115, "impressions": 1808, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 2, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m5", "kind": "month", "start": "2026-06-01", "end": "2026-06-30", "title": "2026年6月", "days": 30, "full_days": 30, "current": false, "meetings": 8, "seated": 6, "lost": 0, "won": 4, "won25": 3, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 253, "impressions": 13556, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 0, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m6", "kind": "month", "start": "2026-05-01", "end": "2026-05-31", "title": "2026年5月", "days": 31, "full_days": 31, "current": false, "meetings": 8, "seated": 8, "lost": 0, "won": 1, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 268, "impressions": 14557, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 1, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m7", "kind": "month", "start": "2026-04-01", "end": "2026-04-30", "title": "2026年4月", "days": 30, "full_days": 30, "current": false, "meetings": 19, "seated": 19, "lost": 4, "won": 1, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 193, "impressions": 14611, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 1, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m8", "kind": "month", "start": "2026-03-01", "end": "2026-03-31", "title": "2026年3月", "days": 31, "full_days": 31, "current": false, "meetings": 12, "seated": 12, "lost": 3, "won": 0, "won25": 0, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 185, "impressions": 11532, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 1, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m1s", "kind": "month", "start": "2026-10-01", "end": "2026-10-17", "title": "2026年10月（1〜17日）", "days": 17, "full_days": 31, "current": false, "meetings": 16, "seated": 16, "lost": 3, "won": 1, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": 797, "cv": 78, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 225, "impressions": 1461, "sns_sessions": 65, "sns_cv": 0, "pr_sessions": 46, "pr_cv": 1, "sns_pub": 0, "pr": 5, "line_add": 6, "line_block_add": 0, "line_until": "2026-10-17"}], "meta": [{"label": "集計時点", "value": "2026-11-17 12:30 JST"}, {"label": "商談・成約", "value": "Notion商談DB（問い合わせ区分＝法人）。商談設定・着座・失注は商談日の月、成約・送客くん/採用くんは成約日の月（成約日が空なら商談日）"}, {"label": "HP・SNS・PR TIMES流入", "value": "GA4（株式会社YORISOI、Windsor.ai経由）。計測は2026-09-15から。SNS流入＝medium=social、PR流入＝sourceにprtimesを含む"}, {"label": "検索", "value": "Googleサーチコンソール（yorisoi-hr.com、Windsor.ai経由）。直近2〜3日は未反映"}, {"label": "SNS公開投稿・PR配信本数・LINE友だち", "value": "Postiz・PR TIMES管理画面・LINE公式アカウント管理画面から11/14に取得した値（今月分は11/14まで）"}, {"label": "金額", "value": "金額・報酬は含めていません"}]};</script>
+<script>window.dash=(function(){const D={},F={};return{loader:(n,s)=>{D[n]={status:'ok',data:s.fn({answer:window.YDATA}).data};},data:(n)=>D[n]||{status:'missing',data:null},draw:(n,f)=>{if(f)F[n]=f;if(!F[n])return;document.querySelectorAll('[data-draw="'+n+'"]').forEach((e)=>F[n](e));}};})();</script>
+<script>window.Y = {fmt: (v) => (v == null || v === '' || isNaN(+v) ? '—' : d3.format(',')(+v))};
+dash.loader('pstats', {description: 'ファイルの rows を月ごとの行として読みます。', fn: ({answer}) => ({data: answer.rows, columns: ['period', 'title', 'start', 'end', 'meetings', 'seated', 'lost', 'won', 'won25', 'cv', 'sessions', 'clicks', 'impressions', 'sns_sessions', 'sns_cv', 'sns_pub', 'pr', 'pr_sessions', 'pr_cv', 'line_add', 'line_block_add'], meta: answer.meta})});
+</script>
+<script>// ---------- 月別レポート・今月の進捗 ----------
+window.Y_month = window.Y_month || 'm0';
+const RMd = (x) => (+x.slice(5, 7)) + '/' + (+x.slice(8, 10));
+const RM = {
+  rows: () => { const d = dash.data('pstats'); return d.status === 'ok' && d.data ? d.data : null; },
+  months: () => { const r = RM.rows(); return r ? r.filter((x) => x.kind === 'month' && x.period !== 'm1s') : []; },
+  cur: () => RM.months().find((x) => x.period === window.Y_month) || null,
+  // 比べる相手：今月は「先月の同じ日まで」、過去の月は前の月
+  prev: (r) => {
+    const all = RM.rows() || [];
+    if (r.current) return all.find((x) => x.period === 'm1s') || null;
+    return all.find((x) => x.period === 'm' + (+r.period.slice(1) + 1)) || null;
+  },
+  f: (v) => (v == null ? '—' : Y.fmt(v)),
+  pct: (a, b) => (b ? Math.round(100 * a / b) : null)
+};
+const R_DRAWS = ['r-months', 'r-title', 'r-lede', 'r-progress', 'r-cards', 'r-trend'];
+window.YSetMonth = (id) => { window.Y_month = id; R_DRAWS.forEach((n) => dash.draw(n)); };
+
+dash.draw('r-months', (el) => {
+  el.replaceChildren();
+  const ms = RM.months(); if (!ms.length) return;
+  d3.groups(ms, (m) => m.start.slice(0, 4)).forEach(([y, list]) => {
+    const yl = document.createElement('span'); yl.className = 'y-r-year'; yl.textContent = y + '年';
+    el.append(yl);
+    list.forEach((m) => {
+      const b = document.createElement('button'); b.type = 'button';
+      b.textContent = (+m.start.slice(5, 7)) + '月' + (m.current ? '（今月）' : '');
+      b.setAttribute('aria-pressed', m.period === window.Y_month ? 'true' : 'false');
+      b.addEventListener('click', () => window.YSetMonth(m.period));
+      el.append(b);
+    });
+  });
+});
+
+dash.draw('r-title', (el) => { const r = RM.cur(); el.textContent = r ? `${r.title}のサマリー` : '月別レポート'; });
+
+dash.draw('r-lede', (el) => {
+  const r = RM.cur(); el.replaceChildren(); if (!r) return;
+  const p = RM.prev(r);
+  const t = document.createElement('span');
+  t.textContent = r.current
+    ? `${RMd(r.start)}〜${RMd(r.end)}の途中経過（${r.days}/${r.full_days}日）。前月比は「先月の同じ日まで」と比べています。`
+    : `${RMd(r.start)}〜${RMd(r.end)}の月間実績。前月比は${p ? p.title : '前の月'}と比べています。`;
+  el.append(t);
+  if (r.sessions == null || r.ga_partial) {
+    const n = document.createElement('span'); n.className = 'y-warn';
+    n.textContent = r.ga_from ? ` GA4は${RMd(r.ga_from)}からのデータのため、この月のHP・SNS・PR TIMESの流入は${r.sessions == null ? '出せません' : '一部の日だけです'}。` : '';
+    el.append(n);
+  }
+});
+
+// 今月の進捗（今月を選んだとき）／達成状況（過去の月）
+dash.draw('r-progress', (el) => {
+  const r = RM.cur(); el.replaceChildren(); if (!r) return;
+  const left = Math.max(0, r.full_days - r.days);
+  const items = [['着座', r.seated, r.target_seated], ['送客くん・採用くんの成約', r.won25, r.target_won], ['商談設定', r.meetings, r.target_seated]];
+  const head = document.createElement('div'); head.className = 'y-r-ph';
+  const h = document.createElement('b'); h.textContent = r.current ? '今月の進捗' : '目標の達成状況';
+  head.append(h);
+  if (r.current) {
+    const dbar = document.createElement('div'); dbar.className = 'y-r-days';
+    const s = document.createElement('span'); s.textContent = `経過 ${r.days}日／${r.full_days}日（残り${left}日）`;
+    const bar = document.createElement('div'); bar.className = 'y-bar'; const i = document.createElement('i'); i.style.width = (100 * r.days / r.full_days) + '%'; bar.append(i);
+    dbar.append(s, bar); head.append(dbar);
+  }
+  el.append(head);
+  const grid = document.createElement('div'); grid.className = 'y-r-pgrid';
+  items.forEach(([name, v, tgt], k) => {
+    const c = document.createElement('div'); c.className = 'y-r-pc';
+    const l = document.createElement('div'); l.className = 'y-pk-l'; l.textContent = name + (k === 2 ? '（目安）' : '');
+    const big = document.createElement('div'); big.className = 'y-pk-v';
+    const b = document.createElement('b'); b.textContent = RM.f(v);
+    const u = document.createElement('span'); u.textContent = `／ 目標 ${tgt}件`;
+    big.append(b, u);
+    const rate = RM.pct(v, tgt);
+    const bar = document.createElement('div'); bar.className = 'y-bar'; const fill = document.createElement('i'); fill.style.width = Math.min(100, rate || 0) + '%'; bar.append(fill);
+    if (r.current) { const mk = document.createElement('em'); mk.style.left = (100 * r.days / r.full_days) + '%'; mk.title = '今日時点の目安'; bar.append(mk); }
+    const rows = [];
+    if (r.current) {
+      const pace = Math.round(tgt * r.days / r.full_days);
+      const fc = r.days ? Math.round(v / r.days * r.full_days) : 0;
+      const need = left ? Math.ceil(Math.max(0, tgt - v) / left * 10) / 10 : Math.max(0, tgt - v);
+      rows.push([`達成率 ${rate}%`, rate >= 100 ? 'ok' : (v >= pace ? 'ok' : 'warn')],
+        [`今日時点の目安 ${pace}件`, v >= pace ? 'ok' : 'warn'],
+        [`このペースの着地 ${fc}件`, fc >= tgt ? 'ok' : 'warn'],
+        [v >= tgt ? '目標達成' : `残り${tgt - v}件・1日あたり ${need}件`, v >= tgt ? 'ok' : 'plain']);
+    } else {
+      rows.push([`達成率 ${rate}%`, rate >= 100 ? 'ok' : 'warn'], [v >= tgt ? '目標達成' : `目標まであと${tgt - v}件`, v >= tgt ? 'ok' : 'plain']);
+    }
+    const tags = document.createElement('div'); tags.className = 'y-r-tags';
+    rows.forEach(([txt, tone]) => { const t = document.createElement('span'); t.className = 'y-r-tag t-' + tone; t.textContent = txt; tags.append(t); });
+    c.append(l, big, bar, tags); grid.append(c);
+  });
+  el.append(grid);
+});
+
+// サマリーカード（前月比つき）
+const rDelta = (v, p, unit) => {
+  const s = document.createElement('span'); s.className = 'y-r-delta';
+  if (v == null || p == null) { s.classList.add('t-plain'); s.textContent = '前月比 —'; return s; }
+  const d = v - p;
+  s.classList.add(d > 0 ? 't-up' : d < 0 ? 't-down' : 't-plain');
+  s.textContent = `${d > 0 ? '▲' : d < 0 ? '▼' : '±'}${Y.fmt(Math.abs(d))}${unit || ''}`;
+  return s;
+};
+dash.draw('r-cards', (el) => {
+  const r = RM.cur(); el.replaceChildren(); if (!r) return;
+  const p = RM.prev(r) || {};
+  const cards = [
+    ['商談', '着座', 'seated', '件', `商談設定 ${RM.f(r.meetings)}件・失注 ${RM.f(r.lost)}件`, 'navy'],
+    ['商談', '送客くん・採用くんの成約', 'won25', '件', `全成約 ${RM.f(r.won)}件（成約日で数える）`, 'green'],
+    ['商談', '商談設定', 'meetings', '件', '商談日がこの月の法人商談', 'navy'],
+    ['HP', 'フォーム送信', 'cv', '件', 'GA4キーイベント（営業・求職者も含む）', 'blue'],
+    ['HP', 'HPセッション', 'sessions', '', 'yorisoi-hr.com 全体', 'blue'],
+    ['検索', '検索クリック', 'clicks', '回', `表示 ${RM.f(r.impressions)}回`, 'teal'],
+    ['SNS', 'SNS経由の流入', 'sns_sessions', 'セッション', `公開投稿 ${RM.f(r.sns_pub)}件・送信 ${RM.f(r.sns_cv)}件`, 'purple'],
+    ['PR TIMES', 'PR TIMES経由の流入', 'pr_sessions', 'セッション', `配信 ${RM.f(r.pr)}本・送信 ${RM.f(r.pr_cv)}件`, 'orange'],
+    ['公式LINE', '友だち増加', 'line_add', '人', r.line_until ? `ブロック +${RM.f(r.line_block_add)}・${(+r.line_until.slice(5, 7)) + '/' + (+r.line_until.slice(8, 10))}までのデータ` : 'データなし', 'green']
+  ];
+  cards.forEach(([ch, name, f, unit, sub, tone]) => {
+    const c = document.createElement('div'); c.className = 'y-pk t-' + tone;
+    const l = document.createElement('div'); l.className = 'y-pk-l'; l.textContent = `${ch}｜${name}`;
+    const n = document.createElement('div'); n.className = 'y-pk-v';
+    const b = document.createElement('b'); b.textContent = RM.f(r[f]);
+    const u = document.createElement('span'); u.textContent = unit;
+    n.append(b, u);
+    const dl = document.createElement('div'); dl.className = 'y-r-dl';
+    dl.append(rDelta(r[f], p[f], unit === 'セッション' ? '' : unit));
+    const pv = document.createElement('span'); pv.className = 'y-sub'; pv.textContent = p.title ? `${r.current ? '先月同日' : '前月'} ${RM.f(p[f])}` : '';
+    dl.append(pv);
+    const s = document.createElement('div'); s.className = 'y-sub'; s.textContent = sub;
+    c.append(l, n, dl, s); el.append(c);
+  });
+});
+
+// 月別の推移（表）
+dash.draw('r-trend', (el) => {
+  const ms = RM.months(); el.replaceChildren(); if (!ms.length) return;
+  const cols = [['月', null], ['商談設定', 'meetings'], ['着座', 'seated'], ['着座の達成率', 'rate'], ['送客くん・採用くん', 'won25'], ['全成約', 'won'], ['フォーム送信', 'cv'], ['HPセッション', 'sessions'], ['検索クリック', 'clicks'], ['SNS流入', 'sns_sessions'], ['PR配信', 'pr'], ['PR流入', 'pr_sessions'], ['LINE友だち増加', 'line_add']];
+  const t = document.createElement('table'); t.className = 'y-table';
+  const th = document.createElement('thead'); const hr = document.createElement('tr');
+  cols.forEach(([c]) => { const x = document.createElement('th'); x.textContent = c; hr.append(x); });
+  th.append(hr); t.append(th);
+  const tb = document.createElement('tbody');
+  ms.forEach((r) => {
+    const tr = document.createElement('tr'); tr.className = 'y-go' + (r.period === window.Y_month ? ' y-r-sel' : '');
+    tr.addEventListener('click', () => window.YSetMonth(r.period));
+    cols.forEach(([c, f]) => {
+      const td = document.createElement('td');
+      if (!f) { td.textContent = r.title + (r.current ? `（${r.days}日目）` : ''); }
+      else if (f === 'rate') { const v = RM.pct(r.seated, r.target_seated); td.className = 'n'; td.textContent = v == null ? '—' : v + '%'; if (v != null) td.classList.add(v >= 100 ? 'y-ok' : 'y-warn'); }
+      else { td.className = 'n'; td.textContent = RM.f(r[f]); }
+      tr.append(td);
+    });
+    tb.append(tr);
+  });
+  t.append(tb);
+  const w = document.createElement('div'); w.className = 'y-tablewrap'; w.append(t);
+  el.append(w);
+});
+</script>
+</body></html>
