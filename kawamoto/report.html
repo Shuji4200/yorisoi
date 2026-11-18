@@ -53,16 +53,37 @@ html,body{margin:0;background:#fff}body{padding:16px}
 .y-table tr.y-go{cursor:pointer}.y-table tr.y-go:hover td{background:#f8faf9}
 .y-table tr.y-r-sel td{background:#eef7f2;font-weight:700}
 .y-note{margin-top:16px;font-size:12px;color:#8b909a;line-height:1.7}
+
+.y-tabs{display:flex;gap:6px;margin:0 0 14px;padding:6px;background:#f6f7f9;border:1px solid #e7e9ee;border-radius:14px;width:fit-content;max-width:100%;flex-wrap:wrap}
+.y-tabs button{border:0;background:transparent;border-radius:10px;padding:8px 18px;font:inherit;font-size:14px;font-weight:700;color:#5b606a;cursor:pointer}
+.y-tabs button[aria-selected=true]{background:#fff;color:#16181d;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.y-panel[hidden]{display:none}
+.t-status{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.t-ph{display:grid;grid-template-columns:150px 1fr 70px;gap:12px;align-items:center;padding:8px 0;border-top:1px solid #eef0f3}
+.t-ph:first-child{border-top:0}
+.t-ph .y-bar{margin:0}.t-ph .y-bar>i{background:#22a06b}
+.t-ph b{font-size:13px}.t-ph .n{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;color:#5b606a}
+.t-ph small{display:block;font-size:11px;color:#8b909a;font-weight:400}
+.t-pill{display:inline-block;font-size:12px;border-radius:999px;padding:2px 10px;font-weight:700;background:#f1f3f6;color:#5b606a}
+.t-pill.ok{background:#e6f6ee;color:#167a4f}.t-pill.ng{background:#fdecec;color:#c0392b}.t-pill.now{background:#e8f0fe;color:#1d4ed8}
+.y-table td.wrap{white-space:normal;min-width:220px}
+@media (max-width:600px){.t-ph{grid-template-columns:1fr 60px}.t-ph .y-bar{grid-column:1/-1;order:3}}
 </style>
 </head><body>
 
 <div class="y-wrap">
  <div class="y-r-hero" id="hero">
   <div class="y-r-kicker">YORISOI 広報・マーケ｜週次MTG用</div>
-  <h1 class="y-h1">月次レポート</h1>
-  <p>商談・HP・検索・SNS・PR TIMES・公式LINEの数字を月ごとにまとめています。月を選ぶと切り替わります。</p>
+  <h1 class="y-h1">定例レポート</h1>
+  <p>広報・マーケの月次の数字と、新人（林さん）の育成・引き継ぎの進み具合をまとめています。下のタブで切り替えます。</p>
  </div>
  <div class="y-asof" id="asof">2026年11月17日 12:30時点の集計です。毎週の定例前に最新化します。</div>
+ <div class="y-tabs" role="tablist" aria-label="表示する内容">
+  <button type="button" role="tab" id="tab-report" aria-controls="panel-report" aria-selected="true">月次レポート</button>
+  <button type="button" role="tab" id="tab-training" aria-controls="panel-training" aria-selected="false">林さんの育成・引き継ぎ</button>
+ </div>
+ <div class="y-panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report">
+
  <div class="y-r-months" id="months" role="group" aria-label="月" data-draw="r-months" data-source="pstats"></div>
  <h2 class="y-h2" id="summary" data-draw="r-title">—</h2>
  <p class="y-lede" data-draw="r-lede">—</p>
@@ -72,6 +93,20 @@ html,body{margin:0;background:#fff}body{padding:16px}
  <h2 class="y-h2" id="trend">月別の推移<small>行をクリックするとその月に切り替わります</small></h2>
  <div data-draw="r-trend" data-source="pstats"></div>
  <div class="y-note" id="notes">目標：着座 月40件、送客くん・採用くんの成約 月8件（金額は問わない）。商談・成約はNotion商談DB（法人）で、着座・商談設定は商談日の月、成約は成約日の月で数えます。HP・SNS・PR TIMESの流入はGA4（9/15から計測）、検索はサーチコンソール（直近2〜3日は未反映）です。SNSの公開投稿数・PR TIMESの配信本数・公式LINEの友だち増加は、各管理画面から11/14に取得した値です。金額・報酬は載せていません。</div>
+ </div>
+ <div class="y-panel" id="panel-training" role="tabpanel" aria-labelledby="tab-training" hidden>
+  <h2 class="y-h2" style="margin-top:4px">林さんの育成・引き継ぎ進捗<small id="t-asof"></small></h2>
+  <p class="y-lede" id="t-lede"></p>
+  <div class="t-status" id="t-status"></div>
+  <h2 class="y-h2">フェーズ別の進み具合<small>チェックリストの「完了」の数（河本確認済みの数）</small></h2>
+  <div class="y-card" id="t-phases"></div>
+  <h2 class="y-h2">評価ゲート<small>未達のときは右の対応をとります</small></h2>
+  <div class="y-tablewrap"><table class="y-table" id="t-gates"></table></div>
+  <h2 class="y-h2">月別の立ち上がり目標と実績<small>担当チャネル経由の法人商談・転職.comのLINE登録</small></h2>
+  <div class="y-tablewrap"><table class="y-table" id="t-ramp"></table></div>
+  <div class="y-note">元データ：Notion「新入社員教育チェックリスト（戦力化までの道のり）」（全32項目）と「広報マーケ新人の採用・育成計画」（11/1提出）。完了は林さん、確認は河本がチェックします。商談の実績はNotion商談DBで担当が林さんの法人商談（商談日の月）、LINE登録の実績は入社後に転職.comの公式LINEから集計します。金額・報酬は載せていません。</div>
+ </div>
+
 </div>
 
 <script>window.YDATA={"rows": [{"period": "m0", "kind": "month", "start": "2026-11-01", "end": "2026-11-17", "title": "2026年11月", "days": 17, "full_days": 30, "current": true, "meetings": 24, "seated": 15, "lost": 1, "won": 3, "won25": 3, "target_seated": 40, "target_won": 8, "sessions": 823, "cv": 89, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 202, "impressions": 2002, "sns_sessions": 65, "sns_cv": 2, "pr_sessions": 84, "pr_cv": 9, "sns_pub": 72, "pr": 16, "line_add": 7, "line_block_add": 1, "line_until": "2026-11-14"}, {"period": "m1", "kind": "month", "start": "2026-10-01", "end": "2026-10-31", "title": "2026年10月", "days": 31, "full_days": 31, "current": false, "meetings": 33, "seated": 32, "lost": 4, "won": 1, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": 1532, "cv": 174, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 452, "impressions": 2889, "sns_sessions": 141, "sns_cv": 8, "pr_sessions": 103, "pr_cv": 10, "sns_pub": 0, "pr": 15, "line_add": 15, "line_block_add": 2, "line_until": "2026-10-31"}, {"period": "m2", "kind": "month", "start": "2026-09-01", "end": "2026-09-30", "title": "2026年9月", "days": 30, "full_days": 30, "current": false, "meetings": 37, "seated": 34, "lost": 6, "won": 6, "won25": 6, "target_seated": 40, "target_won": 8, "sessions": 809, "cv": 57, "ga_from": "2026-09-15", "ga_partial": true, "clicks": 531, "impressions": 3728, "sns_sessions": 13, "sns_cv": 0, "pr_sessions": 44, "pr_cv": 4, "sns_pub": 0, "pr": 1, "line_add": 29, "line_block_add": 5, "line_until": "2026-09-30"}, {"period": "m3", "kind": "month", "start": "2026-08-01", "end": "2026-08-31", "title": "2026年8月", "days": 31, "full_days": 31, "current": false, "meetings": 21, "seated": 21, "lost": 6, "won": 6, "won25": 5, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 371, "impressions": 3207, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 24, "line_add": 13, "line_block_add": 3, "line_until": "2026-08-31"}, {"period": "m4", "kind": "month", "start": "2026-07-01", "end": "2026-07-31", "title": "2026年7月", "days": 31, "full_days": 31, "current": false, "meetings": 6, "seated": 4, "lost": 0, "won": 4, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 115, "impressions": 1808, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 2, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m5", "kind": "month", "start": "2026-06-01", "end": "2026-06-30", "title": "2026年6月", "days": 30, "full_days": 30, "current": false, "meetings": 8, "seated": 6, "lost": 0, "won": 4, "won25": 3, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 253, "impressions": 13556, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 0, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m6", "kind": "month", "start": "2026-05-01", "end": "2026-05-31", "title": "2026年5月", "days": 31, "full_days": 31, "current": false, "meetings": 8, "seated": 8, "lost": 0, "won": 1, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 268, "impressions": 14557, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 1, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m7", "kind": "month", "start": "2026-04-01", "end": "2026-04-30", "title": "2026年4月", "days": 30, "full_days": 30, "current": false, "meetings": 19, "seated": 19, "lost": 4, "won": 1, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 193, "impressions": 14611, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 1, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m8", "kind": "month", "start": "2026-03-01", "end": "2026-03-31", "title": "2026年3月", "days": 31, "full_days": 31, "current": false, "meetings": 12, "seated": 12, "lost": 3, "won": 0, "won25": 0, "target_seated": 40, "target_won": 8, "sessions": null, "cv": null, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 185, "impressions": 11532, "sns_sessions": null, "sns_cv": null, "pr_sessions": null, "pr_cv": null, "sns_pub": 0, "pr": 1, "line_add": null, "line_block_add": null, "line_until": null}, {"period": "m1s", "kind": "month", "start": "2026-10-01", "end": "2026-10-17", "title": "2026年10月（1〜17日）", "days": 17, "full_days": 31, "current": false, "meetings": 16, "seated": 16, "lost": 3, "won": 1, "won25": 1, "target_seated": 40, "target_won": 8, "sessions": 797, "cv": 78, "ga_from": "2026-09-15", "ga_partial": false, "clicks": 225, "impressions": 1461, "sns_sessions": 65, "sns_cv": 0, "pr_sessions": 46, "pr_cv": 1, "sns_pub": 0, "pr": 5, "line_add": 6, "line_block_add": 0, "line_until": "2026-10-17"}], "meta": [{"label": "集計時点", "value": "2026-11-17 12:30 JST"}, {"label": "商談・成約", "value": "Notion商談DB（問い合わせ区分＝法人）。商談設定・着座・失注は商談日の月、成約・送客くん/採用くんは成約日の月（成約日が空なら商談日）"}, {"label": "HP・SNS・PR TIMES流入", "value": "GA4（株式会社YORISOI、Windsor.ai経由）。計測は2026-09-15から。SNS流入＝medium=social、PR流入＝sourceにprtimesを含む"}, {"label": "検索", "value": "Googleサーチコンソール（yorisoi-hr.com、Windsor.ai経由）。直近2〜3日は未反映"}, {"label": "SNS公開投稿・PR配信本数・LINE友だち", "value": "Postiz・PR TIMES管理画面・LINE公式アカウント管理画面から11/14に取得した値（今月分は11/14まで）"}, {"label": "金額", "value": "金額・報酬は含めていません"}]};</script>
@@ -240,5 +275,75 @@ dash.draw('r-trend', (el) => {
   const w = document.createElement('div'); w.className = 'y-tablewrap'; w.append(t);
   el.append(w);
 });
+</script>
+<script>
+(function(){
+  const T = {"asof": "2026-11-18T15:00", "person": "林さん", "start_month": "2026-12", "start_note": "入社日は役員判断事項", "items": [{"no": 1, "name": "会社・事業理解／業界理解", "phase": "Week1｜研修", "kind": "研修", "when": "Day1", "done": false, "checked": false, "done_at": null}, {"no": 2, "name": "商品理解／業界の今後のトレンド", "phase": "Week1｜研修", "kind": "研修", "when": "Day2", "done": false, "checked": false, "done_at": null}, {"no": 3, "name": "広報マーケの全体像／人口動態から見る今後", "phase": "Week1｜研修", "kind": "研修", "when": "Day3", "done": false, "checked": false, "done_at": null}, {"no": 4, "name": "ツール／渋谷でのポジション", "phase": "Week1｜研修", "kind": "研修", "when": "Day4", "done": false, "checked": false, "done_at": null}, {"no": 5, "name": "ビジネススキル・商談同席", "phase": "Week1｜研修", "kind": "研修", "when": "Day5", "done": false, "checked": false, "done_at": null}, {"no": 6, "name": "Gate1：理解度テスト・ロールプレイ", "phase": "Week1｜研修", "kind": "ゲート", "when": "Day5", "done": false, "checked": false, "done_at": null}, {"no": 7, "name": "毎日の投稿・DM", "phase": "Week2｜実務", "kind": "実務", "when": "Day6〜10 毎日", "done": false, "checked": false, "done_at": null}, {"no": 8, "name": "X・Threads・LinkedIn運用開始", "phase": "Week2｜実務", "kind": "実務", "when": "Day6", "done": false, "checked": false, "done_at": null}, {"no": 9, "name": "プレスリリース起案", "phase": "Week2｜実務", "kind": "成果物", "when": "Day7", "done": false, "checked": false, "done_at": null}, {"no": 10, "name": "note記事", "phase": "Week2｜実務", "kind": "成果物", "when": "Day8", "done": false, "checked": false, "done_at": null}, {"no": 11, "name": "転職.com立ち上げ", "phase": "Week2｜実務", "kind": "実務", "when": "Day9", "done": false, "checked": false, "done_at": null}, {"no": 12, "name": "定例レポート初回", "phase": "Week2｜実務", "kind": "成果物", "when": "Day10", "done": false, "checked": false, "done_at": null}, {"no": 13, "name": "数値の振り返り", "phase": "Week3｜売上計画", "kind": "実務", "when": "Day11", "done": false, "checked": false, "done_at": null}, {"no": 14, "name": "勝ち筋の特定", "phase": "Week3｜売上計画", "kind": "実務", "when": "Day12", "done": false, "checked": false, "done_at": null}, {"no": 15, "name": "売上計画の作成", "phase": "Week3｜売上計画", "kind": "成果物", "when": "Day13", "done": false, "checked": false, "done_at": null}, {"no": 16, "name": "河本と壁打ち", "phase": "Week3｜売上計画", "kind": "実務", "when": "Day14", "done": false, "checked": false, "done_at": null}, {"no": 17, "name": "Gate2：役員発表", "phase": "Week3｜売上計画", "kind": "ゲート", "when": "Day15", "done": false, "checked": false, "done_at": null}, {"no": 18, "name": "計画に沿った運用", "phase": "Week4｜独り立ち", "kind": "実務", "when": "Day16〜29", "done": false, "checked": false, "done_at": null}, {"no": 19, "name": "定例レポート（2回）", "phase": "Week4｜独り立ち", "kind": "成果物", "when": "毎週木曜", "done": false, "checked": false, "done_at": null}, {"no": 20, "name": "Gate3：独り立ち判定", "phase": "Week4｜独り立ち", "kind": "ゲート", "when": "Day30", "done": false, "checked": false, "done_at": null}, {"no": 21, "name": "定常目標の50%", "phase": "2ヶ月目", "kind": "目標", "when": "月間", "done": false, "checked": false, "done_at": null}, {"no": 22, "name": "勉強会：SNSの投稿設計、コピーライティング", "phase": "2ヶ月目", "kind": "勉強会", "when": "週1回", "done": false, "checked": false, "done_at": null}, {"no": 23, "name": "追加業務：LinkedInの本格運用、採用媒体の更新", "phase": "2ヶ月目", "kind": "実務", "when": "月間", "done": false, "checked": false, "done_at": null}, {"no": 24, "name": "定常目標の80%", "phase": "3ヶ月目", "kind": "目標", "when": "月間", "done": false, "checked": false, "done_at": null}, {"no": 25, "name": "勉強会：広報・PR、GA4とファネル分析", "phase": "3ヶ月目", "kind": "勉強会", "when": "週1回", "done": false, "checked": false, "done_at": null}, {"no": 26, "name": "追加業務：PRの起案から配信案まで、セミナー集客の補助", "phase": "3ヶ月目", "kind": "実務", "when": "月間", "done": false, "checked": false, "done_at": null}, {"no": 27, "name": "定常目標の100%", "phase": "4ヶ月目", "kind": "目標", "when": "月間", "done": false, "checked": false, "done_at": null}, {"no": 28, "name": "勉強会：広告運用とLP、クリエイティブ制作", "phase": "4ヶ月目", "kind": "勉強会", "when": "週1回", "done": false, "checked": false, "done_at": null}, {"no": 29, "name": "追加業務：広告クリエイティブの作成補助、YouTube運用の一部", "phase": "4ヶ月目", "kind": "実務", "when": "月間", "done": false, "checked": false, "done_at": null}, {"no": 30, "name": "挑戦水準", "phase": "5ヶ月目", "kind": "目標", "when": "月間", "done": false, "checked": false, "done_at": null}, {"no": 31, "name": "勉強会：マーケ戦略とブランディング、KPI設計", "phase": "5ヶ月目", "kind": "勉強会", "when": "週1回", "done": false, "checked": false, "done_at": null}, {"no": 32, "name": "新施策を1つ自分で企画して実行", "phase": "5ヶ月目", "kind": "成果物", "when": "月間", "done": false, "checked": false, "done_at": null}], "gates": [{"gate": "Gate1", "when": "Day5", "criteria": "理解度テスト80点以上、サービス説明ロールプレイ合格", "fallback": "研修を2日延長"}, {"gate": "Gate2", "when": "Day15", "criteria": "担当計画を役員に発表、Week2の行動KPI達成率80%以上", "fallback": "Day30まで伴走を継続"}, {"gate": "Gate3", "when": "Day30", "criteria": "行動KPI達成率90%以上、担当チャネル経由の商談3件以上、LINE登録12名以上", "fallback": "1ヶ月延長して再評価"}], "ramp": [{"month": "2026-12", "label": "1ヶ月目", "rate": 20, "deals": 3, "line": 12, "study": "（研修期間）", "tasks": "研修→実務→担当計画→独り立ち", "goal": "Gate3通過（独り立ち）"}, {"month": "2027-01", "label": "2ヶ月目", "rate": 50, "deals": 6, "line": 30, "study": "SNSの投稿設計、コピーライティング", "tasks": "LinkedInの本格運用、採用媒体の更新", "goal": "担当チャネルを1人で回せる"}, {"month": "2027-02", "label": "3ヶ月目", "rate": 80, "deals": 10, "line": 48, "study": "広報・PR、GA4とファネル分析", "tasks": "PRの起案から配信案まで、セミナーの集客補助", "goal": "数値から改善案を自分で出せる"}, {"month": "2027-03", "label": "4ヶ月目", "rate": 100, "deals": 12, "line": 60, "study": "広告運用とLP、クリエイティブ制作", "tasks": "広告クリエイティブの作成補助、YouTube運用の一部", "goal": "定常目標を達成できる"}, {"month": "2027-04", "label": "5ヶ月目", "rate": 150, "deals": 18, "line": 90, "study": "マーケ戦略とブランディング、KPI設計", "tasks": "新施策を1つ自分で企画して実行", "goal": "自ら施策を企画し、担当範囲を広げられる（挑戦水準）"}], "phases": [{"key": "w1", "name": "Week1｜研修", "days": "Day1〜5", "content": "会社・事業理解、業界理解、商品理解、広報マーケの全体像、ツール、ビジネススキル", "output": "事業説明メモ・業界構造の1枚図・商品説明シート・練習投稿10本・競合マップ", "gate": "Gate1"}, {"key": "w2", "name": "Week2｜実務", "days": "Day6〜10", "content": "X・Threads・LinkedIn運用開始（毎日X2本・Threads2本・DM10件）、リリース起案、note、転職.com立ち上げ、定例レポート初回", "output": "投稿ログ・リリース原稿1本・note1本・台本3本・初回レポート", "gate": ""}, {"key": "w3", "name": "Week3｜売上計画", "days": "Day11〜15", "content": "ファネルの振り返り、勝ち筋の特定、担当チャネル別の月次KPIと計画づくり、河本と壁打ち", "output": "ファネル表・改善案3つ・担当計画（確定版）・役員発表資料", "gate": "Gate2"}, {"key": "w4", "name": "Week4｜独り立ち", "days": "Day16〜30", "content": "計画どおりに運用。毎日の投稿・DM、週にPR1本・note1本、毎週木曜に定例レポート", "output": "週次レポート2回・評価シート", "gate": "Gate3"}]};
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const ym = (s) => (+s.slice(5,7)) + '月';
+  const asof = new Date(T.asof);
+  const now = new Date(Date.now() + 9*3600e3).toISOString().slice(0,7);
+  const started = now >= T.start_month;
+  const items = T.items, done = items.filter(i => i.done).length, chk = items.filter(i => i.checked).length;
+
+  // タブ
+  const tabs = [['tab-report','panel-report'],['tab-training','panel-training']];
+  const show = (id) => tabs.forEach(([t,p]) => { const on = t === id; $(t).setAttribute('aria-selected', on); $(p).hidden = !on; });
+  tabs.forEach(([t]) => $(t).addEventListener('click', () => { show(t); history.replaceState(null,'', t === 'tab-training' ? '#training' : '#'); }));
+  if (location.hash === '#training') show('tab-training');
+
+  $('t-asof').textContent = `${asof.getMonth()+1}/${asof.getDate()}時点`;
+  const nextItem = items.find(i => !i.done);
+  $('t-lede').textContent = started
+    ? `30日で独り立ちし、2〜5ヶ月目で任せる業務を毎月広げる計画です。チェックリスト${items.length}項目のうち${done}項目が完了しています。`
+    : `${T.person}は${ym(T.start_month)}入社予定のため、育成はまだ始まっていません（${T.start_note}）。入社後はこのタブでチェックリストの完了状況とゲートの結果を毎週お見せします。`;
+
+  // 状態カード
+  const nextGate = items.find(i => i.kind === 'ゲート' && !i.done);
+  const curPhase = started ? (nextItem ? nextItem.phase : '完了') : '入社前';
+  const cards = [
+    ['現在のフェーズ', curPhase, started ? '' : `${ym(T.start_month)}入社予定`, 't-navy'],
+    ['チェックリスト完了', `${done}`, `/ ${items.length}項目（${Math.round(100*done/items.length)}%）`, 't-green'],
+    ['河本の確認済み', `${chk}`, `/ ${items.length}項目`, 't-blue'],
+    ['次のゲート', nextGate ? nextGate.name.split('：')[0] : '—', nextGate ? `${nextGate.when}｜${(T.gates.find(g => nextGate.name.startsWith(g.gate))||{}).criteria||''}` : '', 't-orange']
+  ];
+  cards.forEach(([l,v,s,c]) => {
+    const k = el('div','y-pk '+c); k.append(el('div','y-pk-l',l));
+    const vv = el('div','y-pk-v'); vv.append(el('b',null,v)); if (s) vv.append(el('span',null,s)); k.append(vv);
+    $('t-status').append(k);
+  });
+
+  // フェーズ別
+  const order = [...new Set(items.map(i => i.phase))];
+  order.forEach((p) => {
+    const its = items.filter(i => i.phase === p), d = its.filter(i => i.done).length, c = its.filter(i => i.checked).length;
+    const ph = T.phases.find(x => x.name === p);
+    const row = el('div','t-ph');
+    const name = el('b',null,p); name.append(el('small',null, ph ? ph.days : '月間の目標・勉強会・追加業務'));
+    const bar = el('div','y-bar'); const fill = el('i'); fill.style.width = (100*d/its.length)+'%'; bar.append(fill);
+    row.append(name, bar, el('div','n',`${d}/${its.length}（${c}）`));
+    $('t-phases').append(row);
+  });
+
+  // ゲート
+  const gt = $('t-gates');
+  const hr = gt.insertRow(); ['ゲート','時期','合格基準','未達のときの対応','結果'].forEach(h => hr.append(el('th',null,h)));
+  T.gates.forEach((g) => {
+    const it = items.find(i => i.name.startsWith(g.gate));
+    const r = gt.insertRow();
+    r.append(el('td',null,g.gate), el('td',null,g.when), el('td','wrap',g.criteria), el('td','wrap',g.fallback));
+    const td = el('td'); td.append(el('span','t-pill'+(it && it.done ? ' ok' : ''), it && it.done ? '合格' : '未実施')); r.append(td);
+  });
+
+  // 立ち上がり
+  const rt = $('t-ramp');
+  const h2 = rt.insertRow(); ['月','目標の水準','商談 目標','商談 実績','LINE登録 目標','LINE登録 実績','勉強会','追加で任せる業務'].forEach(h => h2.append(el('th',null,h)));
+  T.ramp.forEach((m) => {
+    const r = rt.insertRow(); const on = m.month <= now;
+    const td0 = el('td'); td0.append(el('b',null,`${ym(m.month)}（${m.label}）`)); if (m.month === now) { td0.append(' '); td0.append(el('span','t-pill now','今月')); }
+    r.append(td0, el('td',null,m.goal), el('td','n',m.deals+'件'), el('td','n', on ? (m.deals_actual ?? 0)+'件' : '—'), el('td','n',m.line+'名'), el('td','n', on ? (m.line_actual == null ? '集計前' : m.line_actual+'名') : '—'), el('td','wrap',m.study), el('td','wrap',m.tasks));
+  });
+})();
 </script>
 </body></html>
