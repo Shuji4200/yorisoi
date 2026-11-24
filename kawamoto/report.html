@@ -53,8 +53,8 @@ html,body{margin:0;background:#fff}body{padding:16px}
 .y-table tr.y-go{cursor:pointer}.y-table tr.y-go:hover td{background:#f8faf9}
 .y-table tr.y-r-sel td{background:#eef7f2;font-weight:700}
 .y-note{margin-top:16px;font-size:12px;color:#8b909a;line-height:1.7}
-.y-won li b{flex-shrink:0;white-space:nowrap}.y-won{list-style:none;margin:12px 0 0;padding:10px 0 0;border-top:1px solid #eef0f3;font-size:13px}.y-won li{display:flex;justify-content:space-between;gap:10px;padding:4px 0}.y-won li span{color:#5b606a;white-space:nowrap}
-
+.y-won li{display:block!important;padding:4px 0}.y-won li b{display:block}.y-won li span{display:block;text-align:left!important;color:#5b606a;font-size:12px}.y-won{list-style:none;margin:12px 0 0;padding:10px 0 0;border-top:1px solid #eef0f3;font-size:13px}.y-won li{display:flex;justify-content:space-between;gap:10px;padding:4px 0}.y-won li span{color:#5b606a;white-space:nowrap}
+.y-amt{display:inline-flex;flex-direction:column;align-items:flex-start;margin-left:14px;padding:4px 12px;border-left:3px solid #22a06b;background:#f3fbf7;border-radius:8px;vertical-align:bottom;line-height:1.2}.y-amt small{font-size:11px;font-weight:700;color:#167a4f}.y-amt b{font-size:22px!important;font-weight:800;color:#167a4f}
 .y-tabs{display:flex;gap:6px;margin:0 0 14px;padding:6px;background:#f6f7f9;border:1px solid #e7e9ee;border-radius:14px;width:fit-content;max-width:100%;flex-wrap:wrap}
 .y-tabs button{border:0;background:transparent;border-radius:10px;padding:8px 18px;font:inherit;font-size:14px;font-weight:700;color:#5b606a;cursor:pointer}
 .y-tabs button[aria-selected=true]{background:#fff;color:#16181d;box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -263,6 +263,7 @@ const RM = {
     return all.find((x) => x.period === 'm' + (+r.period.slice(1) + 1)) || null;
   },
   f: (v) => (v == null ? '—' : Y.fmt(v)),
+  amt: (v, label) => { const w = document.createElement('span'); w.className = 'y-amt'; const t = document.createElement('small'); t.textContent = label; const m = document.createElement('b'); m.textContent = RM.man(v); w.append(t, m); return w; },
   man: (v) => (v == null ? '—' : (Math.round(v / 1000) / 10).toLocaleString('ja-JP') + '万円'),
   pct: (a, b) => (b ? Math.round(100 * a / b) : null)
 };
@@ -325,6 +326,7 @@ dash.draw('r-progress', (el) => {
     const b = document.createElement('b'); b.textContent = RM.f(v);
     const u = document.createElement('span'); u.textContent = `／ 目標 ${tgt}件`;
     big.append(b, u);
+    if (r.won_amount) big.append(RM.amt(r.won_amount, '今月の契約金額'));
     const rate = RM.pct(v, tgt);
     const bar = document.createElement('div'); bar.className = 'y-bar'; const fill = document.createElement('i'); fill.style.width = Math.min(100, rate || 0) + '%'; bar.append(fill);
     if (r.current) { const mk = document.createElement('em'); mk.style.left = (100 * r.days / r.full_days) + '%'; mk.title = '今日時点の目安'; bar.append(mk); }
@@ -389,6 +391,7 @@ dash.draw('r-cards', (el) => {
     const b = document.createElement('b'); b.textContent = RM.f(cv(r[f]));
     const u = document.createElement('span'); u.textContent = unit;
     n.append(b, u);
+    if (['seated', 'won25', 'meetings'].includes(f) && r.won_amount) n.append(RM.amt(r.won_amount, '契約金額'));
     const dl = document.createElement('div'); dl.className = 'y-r-dl';
     dl.append(rDelta(cv(r[f]), p[f] == null ? null : cv(p[f]), unit === 'セッション' ? '' : unit === '%' ? 'pt' : unit));
     const pv = document.createElement('span'); pv.className = 'y-sub'; pv.textContent = p.title ? `${r.current ? '先月同日' : '前月'} ${RM.f(p[f] == null ? null : cv(p[f]))}` : '';
