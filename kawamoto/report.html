@@ -54,7 +54,7 @@ html,body{margin:0;background:#fff}body{padding:16px}
 .y-table tr.y-r-sel td{background:#eef7f2;font-weight:700}
 .y-note{margin-top:16px;font-size:12px;color:#8b909a;line-height:1.7}
 .y-won li{display:block!important;padding:4px 0}.y-won li b{display:block}.y-won li span{display:block;text-align:left!important;color:#5b606a;font-size:12px}.y-won{list-style:none;margin:12px 0 0;padding:10px 0 0;border-top:1px solid #eef0f3;font-size:13px}.y-won li{display:flex;justify-content:space-between;gap:10px;padding:4px 0}.y-won li span{color:#5b606a;white-space:nowrap}
-.y-amt{display:inline-flex;flex-direction:column;align-items:flex-start;margin-left:14px;padding:4px 12px;border-left:3px solid #22a06b;background:#f3fbf7;border-radius:8px;vertical-align:bottom;line-height:1.2}.y-amt small{font-size:11px;font-weight:700;color:#167a4f}.y-amt b{font-size:22px!important;font-weight:800;color:#167a4f}
+.y-amt{display:inline-flex;flex-direction:column;align-items:flex-start;margin-left:14px;padding:4px 12px;border-left:3px solid #22a06b;background:#f3fbf7;border-radius:8px;vertical-align:bottom;line-height:1.2}.y-amt small{font-size:11px;font-weight:700;color:#167a4f}.y-amt b{font-size:22px!important;font-weight:800;color:#167a4f}.y-pk.y-key,.y-r-pc{background:#fff1f1!important;border-color:#f6c9c6!important}.y-pk.y-key{border-left-color:#e5484d!important}.y-pk.y-key .y-pk-l{color:#b42318}.y-r-pc .y-pk-l{color:#b42318}
 .y-tabs{display:flex;gap:6px;margin:0 0 14px;padding:6px;background:#f6f7f9;border:1px solid #e7e9ee;border-radius:14px;width:fit-content;max-width:100%;flex-wrap:wrap}
 .y-tabs button{border:0;background:transparent;border-radius:10px;padding:8px 18px;font:inherit;font-size:14px;font-weight:700;color:#5b606a;cursor:pointer}
 .y-tabs button[aria-selected=true]{background:#fff;color:#16181d;box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -373,9 +373,9 @@ dash.draw('r-cards', (el) => {
   const cards = [
     ['商談', '着座', 'seated', '件', `商談設定 ${RM.f(r.meetings)}件・失注 ${RM.f(r.lost)}件`, 'navy'],
     ['商談', '送客くん・採用くんの成約', 'won25', '件', `全成約 ${RM.f(r.won)}件（成約日で数える）` + (r.won_amount ? `・契約金額 計${RM.man(r.won_amount)}` : ''), 'green'],
+    ['商談', '商談設定', 'meetings', '件', '商談日がこの月の法人商談', 'navy'],
     ['商談', '契約金額（成約の合計）', 'won_amount', '万円', r.won_amount ? `採用くん ${RM.man(r.won_amount_saiyo)}・送客くん ${RM.man(r.won_amount_soukyaku)}（成果報酬の契約は含まない）` : 'この月の金額は未集計', 'green', (v) => (v == null ? null : Math.round(v / 10000))],
     ['商談', '着座→成約率', 'seat_rate', '%', r.seated ? `成約 ${RM.f(r.won)}件 ÷ 着座 ${RM.f(r.seated)}件` + (r.won_amount ? `・着座1件あたり 約${RM.man(r.won_amount / r.seated)}` : '') : '着座なし', 'green'],
-    ['商談', '商談設定', 'meetings', '件', '商談日がこの月の法人商談', 'navy'],
     ['HP', 'フォーム送信', 'cv', '件', 'GA4キーイベント（営業・求職者も含む）', 'blue'],
     ['HP', '有効な問い合わせ', 'valid_inq', '件', r.valid_inq == null ? 'Gmail連携（10/22）前のため未集計' : `送客くん ${RM.f(r.valid_soukyaku)}・新卒の送客 ${RM.f(r.valid_shinsotsu)}・採用くん ${RM.f(r.valid_saiyo)}・FC ${RM.f(r.valid_fc)}（要確認 ${RM.f(r.valid_check)}件は除く）`, 'blue'],
     ['HP', 'HPセッション', 'sessions', '', 'yorisoi-hr.com 全体', 'blue'],
@@ -386,7 +386,7 @@ dash.draw('r-cards', (el) => {
   ];
   cards.forEach(([ch, name, f, unit, sub, tone, conv]) => {
     const cv = conv || ((v) => v);
-    const c = document.createElement('div'); c.className = 'y-pk t-' + tone;
+    const c = document.createElement('div'); c.className = 'y-pk t-' + tone + (['seated', 'won25', 'meetings'].includes(f) ? ' y-key' : '');
     const l = document.createElement('div'); l.className = 'y-pk-l'; l.textContent = `${ch}｜${name}`;
     const n = document.createElement('div'); n.className = 'y-pk-v';
     const b = document.createElement('b'); b.textContent = RM.f(cv(r[f]));
