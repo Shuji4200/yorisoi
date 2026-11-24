@@ -152,7 +152,7 @@ html,body{margin:0;background:#fff}body{padding:16px}
   <tr><td>コラム（一覧＋記事）</td><td class="n">約110</td><td class="wrap">一覧40、記事は1本あたり1〜10</td></tr>
  </table></div>
 
- <div class="y-note" id="notes">目標：着座 月40件、送客くん・採用くんの成約 月8件（金額は問わない）。11月の契約金額はKPIシートの契約法人一覧の金額（成約1件ごとの契約金額で、月額とは限りません。成果報酬型の美喜株式会社は合計に含めていません）。着座→成約率は、その月の成約数÷その月の着座数です（着座した商談がその月に成約したとは限りません）。商談・成約は11月分を広報マーケKPIシート（Notion商談DBは11/11以降が未反映）、10月以前をNotion商談DB（法人）で数え、着座・商談設定は商談日の月、成約は成約日の月で数えます。有効な問い合わせは、HPフォームの通知メール（Gmail、10/22から受信）を1件ずつ読み、送客くん・新卒の送客・採用くん・FCを利用したい問い合わせを数えたものです（営業・売り込み、取材、求職者、重複送信は除く）。11月の有効な問い合わせとフォーム送信は11/24 14時までの数です。HP・SNS・PR TIMESの流入はGA4（9/15から計測）、検索はサーチコンソール（11/21まで反映、前月比は10/1〜21と比較）です。SNSの公開投稿数はPostiz（11/1〜11/23）、PR TIMESの配信本数と公式LINEの友だち増加は各管理画面から11/14に取得した値のままです。11月の商談設定は11/24以降の予定を含み、着座は11/23までに実施したもの（キャンセル・リスケ除く）です。</div>
+ <div class="y-note" id="notes">目標：着座 月40件、送客くん・採用くんの成約 月8件（金額は問わない）。11月の契約金額はKPIシートの契約法人一覧の金額（成約1件ごとの契約金額で、月額とは限りません。成果報酬型の美喜株式会社は合計に含めていません）。着座の価値は、BtoBリードの着座1件を3.5〜5万円とみなして着座数に掛けた目安です（実際の売上ではありません）。着座→成約率は、その月の成約数÷その月の着座数です（着座した商談がその月に成約したとは限りません）。商談・成約は11月分を広報マーケKPIシート（Notion商談DBは11/11以降が未反映）、10月以前をNotion商談DB（法人）で数え、着座・商談設定は商談日の月、成約は成約日の月で数えます。有効な問い合わせは、HPフォームの通知メール（Gmail、10/22から受信）を1件ずつ読み、送客くん・新卒の送客・採用くん・FCを利用したい問い合わせを数えたものです（営業・売り込み、取材、求職者、重複送信は除く）。11月の有効な問い合わせとフォーム送信は11/24 14時までの数です。HP・SNS・PR TIMESの流入はGA4（9/15から計測）、検索はサーチコンソール（11/21まで反映、前月比は10/1〜21と比較）です。SNSの公開投稿数はPostiz（11/1〜11/23）、PR TIMESの配信本数と公式LINEの友だち増加は各管理画面から11/14に取得した値のままです。11月の商談設定は11/24以降の予定を含み、着座は11/23までに実施したもの（キャンセル・リスケ除く）です。</div>
  </div>
  <div class="y-panel" id="panel-training" role="tabpanel" aria-labelledby="tab-training" hidden>
   <h2 class="y-h2" style="margin-top:4px">林さんの育成・引き継ぎ進捗<small id="t-asof"></small></h2>
@@ -264,6 +264,7 @@ const RM = {
   },
   f: (v) => (v == null ? '—' : Y.fmt(v)),
   amt: (v, label) => { const w = document.createElement('span'); w.className = 'y-amt'; const t = document.createElement('small'); t.textContent = label; const m = document.createElement('b'); m.textContent = RM.man(v); w.append(t, m); return w; },
+  seatv: (n) => { const w = document.createElement('span'); w.className = 'y-amt'; const t = document.createElement('small'); t.textContent = '着座の価値（1件3.5〜5万円）'; const m = document.createElement('b'); m.textContent = n ? `${(Math.round(n * 35) / 10).toLocaleString('ja-JP')}〜${(n * 5).toLocaleString('ja-JP')}万円` : '0円'; w.append(t, m); return w; },
   man: (v) => (v == null ? '—' : (Math.round(v / 1000) / 10).toLocaleString('ja-JP') + '万円'),
   pct: (a, b) => (b ? Math.round(100 * a / b) : null)
 };
@@ -326,7 +327,7 @@ dash.draw('r-progress', (el) => {
     const b = document.createElement('b'); b.textContent = RM.f(v);
     const u = document.createElement('span'); u.textContent = `／ 目標 ${tgt}件`;
     big.append(b, u);
-    if (r.won_amount) big.append(RM.amt(r.won_amount, '今月の契約金額'));
+    if (k === 0) big.append(RM.seatv(v)); else if (k === 1 && r.won_amount) big.append(RM.amt(r.won_amount, '今月の契約金額'));
     const rate = RM.pct(v, tgt);
     const bar = document.createElement('div'); bar.className = 'y-bar'; const fill = document.createElement('i'); fill.style.width = Math.min(100, rate || 0) + '%'; bar.append(fill);
     if (r.current) { const mk = document.createElement('em'); mk.style.left = (100 * r.days / r.full_days) + '%'; mk.title = '今日時点の目安'; bar.append(mk); }
@@ -391,7 +392,7 @@ dash.draw('r-cards', (el) => {
     const b = document.createElement('b'); b.textContent = RM.f(cv(r[f]));
     const u = document.createElement('span'); u.textContent = unit;
     n.append(b, u);
-    if (['seated', 'won25', 'meetings'].includes(f) && r.won_amount) n.append(RM.amt(r.won_amount, '契約金額'));
+    if (f === 'seated' && r.seated != null) n.append(RM.seatv(r.seated)); else if (f === 'won25' && r.won_amount) n.append(RM.amt(r.won_amount, '契約金額'));
     const dl = document.createElement('div'); dl.className = 'y-r-dl';
     dl.append(rDelta(cv(r[f]), p[f] == null ? null : cv(p[f]), unit === 'セッション' ? '' : unit === '%' ? 'pt' : unit));
     const pv = document.createElement('span'); pv.className = 'y-sub'; pv.textContent = p.title ? `${r.current ? '先月同日' : '前月'} ${RM.f(p[f] == null ? null : cv(p[f]))}` : '';
