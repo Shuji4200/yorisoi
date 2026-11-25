@@ -21,8 +21,9 @@ document.querySelectorAll('[data-fseg]').forEach((btn) => {
   });
 });
 dash.draw('f-summary', (el) => {
-  const src = window.Y_funnel === 'all' ? 'funnel_all' : 'funnel';
-  const d = dash.data(src);
+  const all = window.Y_funnel === 'all';
+  const d0 = dash.data(all ? 'funnel_all' : 'pfunnel');
+  const d = d0.status === 'ok' && d0.data && !all ? {status: 'ok', data: d0.data.filter((r) => r.period === window.Y_period)} : d0;
   if (d.status !== 'ok' || !d.data) { el.textContent = ''; return; }
   const seat = d.data.find((r) => r.step === '着座'), won = d.data.find((r) => r.step === '成約');
   const rate = seat && seat.value ? Math.round(1000 * won.value / seat.value) / 10 : null;

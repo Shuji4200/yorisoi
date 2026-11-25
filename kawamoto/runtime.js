@@ -3,7 +3,8 @@
   const SNAP = Date.parse(window.YSNAP.at);
   Date.now = () => SNAP; // 「今月」「今日」をスナップショット時点に固定
   const calcs = {}, draws = {}, cache = {};
-  const run = (name, el) => { try { draws[name](el); } catch (e) { console.error('draw', name, e); } };
+  const made = new WeakMap();
+  const run = (name, el) => { try { const d = draws[name]; if (typeof d === 'function') d(el); else { if (!made.has(el)) made.set(el, d.mount(el)); d.update(el, made.get(el)); } } catch (e) { console.error('draw', name, e); } };
   window.dash = {
     colors: ['#3b6fd8', '#e8833a', '#22a06b', '#8b5cf6'],
     loader() {},

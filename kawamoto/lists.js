@@ -11,9 +11,9 @@ dash.draw('deal-kind', (sel) => {
   sel.value = window.Y_dealKind || '';
   sel.onchange = () => { window.Y_dealKind = sel.value; dash.draw('deals-body'); dash.draw('deal-count'); };
 });
-const dealFilter = (r) => (!window.Y_dealStatus || r.status === window.Y_dealStatus) && (!window.Y_dealKind || r.kind === window.Y_dealKind);
-dash.draw('deal-count', (el) => { const d = dash.data('deals_recent'); el.textContent = d.status === 'ok' ? d.data.filter(dealFilter).length + '件' : ''; });
-dash.draw('deals-body', (tb) => Y.table(tb, 'deals_recent', [
+const dealFilter = (r) => (!window.Y_dealStatus || r.status === window.Y_dealStatus) && (!window.Y_dealKind || r.kind === window.Y_dealKind) && (!window.YInP || window.YInP(r.meeting_at));
+dash.draw('deal-count', (el) => { const d = dash.data('deals_sorted'); el.textContent = d.status === 'ok' ? d.data.filter(dealFilter).length + '件' : ''; });
+dash.draw('deals-body', (tb) => Y.table(tb, 'deals_sorted', [
   {f: 'meeting_at', cls: 'n'}, {f: 'company', link: 'url'}, {f: 'status', pill: 1}, {f: 'kind'}, {f: 'channel'}, {f: 'services', list: 1}, {f: 'owner'}, {f: 'lost_reason'}, {f: 'next_action', cls: 'w'}
 ], {key: 'url', filter: dealFilter}));
 dash.draw('follow-body', (tb) => Y.table(tb, 'followups', [
@@ -30,9 +30,9 @@ dash.draw('pr-body', (tb) => Y.table(tb, 'pr_ga', [
 ], {key: 'no'}));
 const ss = (f) => (el) => { const d = dash.data('sns_summary'); Y.setText(el, d.status, d.status === 'ok' ? d.data[0][f] : ''); };
 dash.draw('sns-pub', ss('published')); dash.draw('sns-q', ss('queued')); dash.draw('sns-d', ss('drafts'));
-dash.draw('sns-acc-body', (tb) => Y.table(tb, 'sns_accounts', [{f: 'account'}, {f: 'published', num: 1, cls: 'n'}, {f: 'queued', num: 1, cls: 'n'}, {f: 'drafts', num: 1, cls: 'n'}], {key: 'account'}));
+dash.draw('sns-acc-body', (tb) => Y.table(tb, 'sns_acc_period', [{f: 'account'}, {f: 'published', num: 1, cls: 'n'}, {f: 'queued', num: 1, cls: 'n'}, {f: 'drafts', num: 1, cls: 'n'}], {key: 'key', filter: (r) => r.period === window.Y_period}));
 dash.draw('sns-utm-body', (tb) => Y.table(tb, 'sns_utm', [{f: 'source'}, {f: 'sessions', num: 1, cls: 'n'}, {f: 'cv', num: 1, cls: 'n'}], {key: 'source'}));
-dash.draw('sns-body', (tb) => Y.table(tb, 'sns_posts', [{f: 'date', cls: 'n'}, {f: 'account'}, {f: 'state', pill: 1}, {f: 'text', cls: 'w'}], {key: 'id'}));
+dash.draw('sns-body', (tb) => Y.table(tb, 'sns_posts', [{f: 'date', cls: 'n'}, {f: 'account'}, {f: 'state', pill: 1}, {f: 'text', cls: 'w'}], {key: 'id', filter: (r) => !window.YInP || window.YInP(r.date)}));
 dash.draw('ga-ch-body', (tb) => Y.table(tb, 'ga_channel', [{f: 'session_default_channel_group'}, {f: 'sessions', num: 1, cls: 'n'}, {f: 'conversions', num: 1, cls: 'n'}], {key: 'session_default_channel_group'}));
 dash.draw('analysis-body', (tb) => Y.table(tb, 'analyses', [
   {f: 'd', cls: 'n'}, {f: 'title', link: 'url'}, {f: 'purpose', pill: 1}, {f: 'status'}, {f: 'conclusion', cls: 'w'}, {f: 'next', cls: 'w'}

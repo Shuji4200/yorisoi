@@ -69,8 +69,10 @@ dash.draw('c-sess', gm('sessions'));
 ['lg0', 'lg1', 'lg2', 'lg3'].forEach((n, i) => dash.draw(n, (el) => { el.style.background = dash.colors[i % 2]; }));
 
 dash.draw('funnel', (el) => {
-  const src = window.Y_funnel === 'all' ? 'funnel_all' : 'funnel';
-  const d = dash.data(src);
+  const all = window.Y_funnel === 'all';
+  const src = all ? 'funnel_all' : 'pfunnel';
+  const d0 = dash.data(src);
+  const d = d0.status === 'ok' && d0.data && !all ? {status: 'ok', data: d0.data.filter((r) => r.period === window.Y_period)} : d0;
   const fcol = ['#9aa0aa', '#3b82f6', '#8b5cf6', '#f59e0b', '#22a06b'];
   el.replaceChildren();
   if (d.status !== 'ok' || !d.data) { const s = document.createElement('div'); s.className = 'y-sub'; s.style.gridColumn = '1/-1'; s.textContent = d.status === 'error' ? '読み込めませんでした' : '読み込み中…'; el.append(s); return; }
@@ -80,9 +82,9 @@ dash.draw('funnel', (el) => {
     const tr = document.createElement('div'); tr.className = 'y-ftrack';
     const fill = document.createElement('i'); fill.style.width = (100 * r.value / max) + '%'; fill.style.background = fcol[i % fcol.length]; tr.append(fill);
     const num = document.createElement('div'); num.className = 'y-fnum'; num.textContent = Y.fmt(r.value);
-    num.dataset.source = src; num.dataset.field = 'value'; num.dataset.row = String(i);
+    num.dataset.source = src; num.dataset.field = 'value'; if (all) num.dataset.row = String(i); else num.dataset.where = 'period=' + r.period + '&step=' + encodeURIComponent(r.step);
     const rate = document.createElement('div'); rate.className = 'y-frate'; rate.textContent = r.rate == null ? (i ? '—' : '') : r.rate + '%';
-    if (r.rate != null) { rate.dataset.source = src; rate.dataset.field = 'rate'; rate.dataset.row = String(i); }
+    if (r.rate != null) { rate.dataset.source = src; rate.dataset.field = 'rate'; if (all) rate.dataset.row = String(i); else rate.dataset.where = 'period=' + r.period + '&step=' + encodeURIComponent(r.step); }
     el.append(lab, tr, num, rate);
   });
 });

@@ -2,7 +2,7 @@
 dash.loader('initiatives', {description: 'ファイルの rows を行として読みます。', fn: ({answer}) => ({data: answer.rows, columns: ['no', 'axis', 'name', 'metric', 'tab'], meta: answer.meta})});
 
 dash.calc('initiative_map', {
-  title: '施策マップ（施策ごとの今月の数字）', description: '施策マスターの24施策それぞれに、今月（日本時間）の代表的な数字を1つ付けます。SNSは「プロフィールUTM経由のHP流入（GA4）」と「Postizの公開投稿数」、PR TIMESは流入とリリース本数、商談はNotion商談DB。データがない施策は「未計測」。',
+  title: '施策マップ（施策ごとの今月の数字）', description: '施策マスターの各施策に、今月（日本時間）の代表的な数字を1つ付けます。SNSは「プロフィールUTM経由のHP流入（GA4）」と「Postizの公開投稿数」、PR TIMESは流入とリリース本数、商談はNotion商談DB。データがない施策は「未計測」。',
   inputs: ['initiatives', 'ga_month', 'ga_source', 'sns_posts', 'line_now', 'pr_total', 'activities_month', 'this_month', 'deals_all', 'deals_recent', 'sc_month', 'analyses', 'weekly_reports', 'measures', 'wantedly_summary', 'pr_admin_total'],
   fn: (initiatives, ga_month, ga_source, sns_posts, line_now, pr_total, activities_month, this_month, deals_all, deals_recent, sc_month, analyses, weekly_reports, measures, wantedly_summary, pr_admin_total) => {
     const ws = wantedly_summary[0] || {}, pa = pr_admin_total[0] || {};
@@ -24,6 +24,7 @@ dash.calc('initiative_map', {
       threads: () => [sess(/^threads/), 'セッション', 'プロフUTM経由・今月の投稿 ' + posts(/^Threads/) + '件'],
       linkedin: () => [posts(/^LinkedIn/), '件', '今月の投稿（流入UTMは未設定）'],
       prtimes: () => [pt.sessions, 'セッション', 'PR TIMES経由・今月のリリース ' + (am.pr ?? 0) + '本・送信 ' + (pt.cv ?? 0) + '件・記事PV ' + Y.fmt(pa.pv) + '（9/1〜）'],
+      lp_ads: () => { const paid = ga_source.filter((r) => /^(cpc|ppc|paid|paidsocial|paid_social|display)$/i.test(String(r.medium))); const s = d3.sum(paid, (r) => +r.sessions); return s ? [s, 'セッション', '広告経由の流入（GA4・medium=cpc等）・送信 ' + d3.sum(paid, (r) => +r.conversions) + '件'] : [null, '', '未実施。開始後は広告のUTM（utm_medium=cpc）で流入と送信を自動集計']; },
       x_official: () => [sess(/^x_(yorisoi|horikoshi)$/), 'セッション', 'プロフUTM経由（公式X・堀越）'],
       deals_record: () => [t.seated, '件', '着座（目標40）・商談設定 ' + (t.meetings ?? 0) + '件'],
       owner_split: () => [mine.length, '件', '河本 ' + mine.filter((r) => r.owner === '河本').length + '件・竹原 ' + mine.filter((r) => r.owner === '竹原').length + '件'],
@@ -38,7 +39,10 @@ dash.calc('initiative_map', {
       postiz: () => [am.sns, '件', '今月の公開投稿（法人向けアカウント）'],
       weekly: () => [weekly_reports.filter((w) => String(w.d).slice(0, 7) === ym).length, '回', wk ? '最新 ' + wk.d + '（' + wk.status + '）' : '—'],
       measure_log: () => [measures.length, '件', '施策ログの記録数（累計）'],
-      handover: () => [null, '', '12月から。進捗の数字はまだありません'],
+      handover: () => [null, '', '12月から。分担表は「育成・引き継ぎ」タブ'],
+      training: () => (today < '2026-12-01' ? [Math.round((Date.parse('2026-12-01') - Date.parse(today)) / 864e5), '日', '林さんの入社（12月予定）まで・30日で独り立ち'] : [Math.round((Date.parse(today) - Date.parse('2026-12-01')) / 864e5) + 1, '日目', '入社からの日数・Day5/15/30に評価ゲート']),
+      trainee_deals: () => (ym < '2026-12' ? [null, '', '12月の入社後に計測（商談DBの担当＝林）'] : [mine.filter((r) => /林/.test(String(r.owner || ''))).length, '件', '今月の担当＝林の法人商談']),
+      routine: () => [null, '', '日報・勉強会の記録は未接続（Notion 新人日報）'],
       roas: () => [null, '', '広告費・売上データ未接続']
     };
     return initiatives.map((i) => {

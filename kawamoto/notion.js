@@ -20,9 +20,10 @@ dash.loader('deals_all', {description: '商談DBのビュー（一覧）を全�
     seated: r['着座'] === '__YES__' ? 1 : 0, lost_reason: r['失注理由'] || '', next_action: r['次回アクション'] || '',
     next_due: r['date:次回期限:start'] ? String(r['date:次回期限:start']).slice(0, 10) : '',
     won25: r['ステータス'] === '成約' && ['採用くん', '送客くん'].includes(r['サービス種別']) ? 1 : 0,
+    closed_at: r['date:成約日:start'] ? String(r['date:成約日:start']).slice(0, 10) : (jst(r['date:商談日:start']) || '').slice(0, 10),
     closed_month: (r['date:成約日:start'] ? String(r['date:成約日:start']).slice(0, 10) : (jst(r['date:商談日:start']) || '')).slice(0, 7)
   }));
-  return {data, columns: ['url', 'company', 'status', 'kind', 'meeting_at', 'channel', 'awareness', 'services', 'contracted', 'owner', 'seated', 'lost_reason', 'next_action', 'next_due', 'won25', 'closed_month'], truncated};
+  return {data, columns: ['url', 'company', 'status', 'kind', 'meeting_at', 'channel', 'awareness', 'services', 'contracted', 'owner', 'seated', 'lost_reason', 'next_action', 'next_due', 'won25', 'closed_at', 'closed_month'], truncated};
 }});
 dash.loader('measures', {description: '施策ログのビューを全ページ読み、表示する列の行にします。', fn: async (ctx) => {
   const {rows, truncated} = await notionPages(ctx);
@@ -60,10 +61,10 @@ dash.calc('deals_month', {
   }
 });
 dash.calc('deals_week', {
-  title: '商談：週別（法人・木曜はじまり）', description: '商談DBの法人の行を、商談日（日本時間）の木曜はじまりの週ごとに数えます（直近12週）。',
+  title: '商談：週別（法人・月曜はじまり）', description: '商談DBの法人の行を、商談日（日本時間）の月曜はじまりの週ごとに数えます（直近12週）。',
   inputs: ['deals_all'],
   fn: (deals_all) => {
-    const wk = (s) => { const d = new Date(s.slice(0, 10) + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 3) % 7)); return d.toISOString().slice(0, 10); };
+    const wk = (s) => { const d = new Date(s.slice(0, 10) + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); return d.toISOString().slice(0, 10); };
     const since = new Date(Date.now() + 9 * 3600e3 - 84 * 86400e3).toISOString().slice(0, 10);
     return d3.rollups(deals_all.filter((r) => r.kind === '法人' && r.meeting_at && r.meeting_at.slice(0, 10) >= since), (v) => ({
       meetings: v.length, seated: d3.sum(v, (r) => r.seated), won: v.filter((r) => r.status === '成約').length

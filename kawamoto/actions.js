@@ -88,6 +88,22 @@ dash.calc('next_actions', {
     const noApply = wantedly_projects.filter((p) => +p.pv >= 90 && !+p.applies && p.short !== '会社訪問リクエスト');
     if (noApply.length) add('Wantedly', 'wantedly', '低', `PV90以上で応募0の募集：${noApply.map((p) => `${p.short}（${p.pv}PV）`).join('・')}`, '募集タイトルと冒頭に仕事内容・育成の具体例を足し、ストーリーから募集へリンクする');
 
+    // 計画中の施策（河本さんが追加した施策。データからの自動提案ではありません）
+    const plan = (channel, tab, pri, fact, action) => out.push({key: 'plan:' + out.length, channel, tab, priority: pri, score: P[pri], fact, action, kind: '施策'});
+    plan('HP', 'traffic', '高', `HPのフォーム送信 ${formCv}件に対し、HP経由の法人商談 ${byCh('HP')}件。どのページ・どの段階で離脱しているかが未特定`,
+      'HPのGA4分析で離脱ポイントを明確にする（ページ別の離脱率・フォーム到達率・フォーム送信率を法人向けページで確認し、直す箇所を決める）');
+    plan('HP', 'traffic', '高', '法人向けの広告は未実施（BtoBリードは自然検索・SNS・PR TIMES頼み）',
+      'LPを作成し、広告運用でBtoBリードを獲得する（採用くん・送客くんのLP、UTM付きで商談DBまで計測）');
+    plan('検索', 'seo', '中', '法人向けの一般キーワード（「送客」「採用代行」など）で10位以内に入っていない。HPの記事は求職者向けのみ',
+      'SEO記事を導入する（人材紹介会社向けの集客・採用代行のテーマで記事を作り、サービスLPへ内部リンク）');
+    plan('HP', 'traffic', '高', 'HPの編集は制作会社経由で、修正・LP追加・記事追加に時間がかかる。【進行中】大井さんに連携済みで、YORISOI側で編集できるようにヒアリング中',
+      'HPの編集権限を獲得し、今後はYORISOI側で編集できるようにする（上の3施策の前提）');
+    plan('SNS', 'sns', '中', '河本アカウントのX記事は7本を作成し、28日間に分けて予約済み（11/18時点）。竹原代表アカウントはフォロワーを増やす施策がまだない',
+      '竹原代表アカウントで「フォロバ作戦」を行い、フォロワー数を増やす（人材紹介会社の経営者・決裁者をフォローし、フォローバックを得る）');
+    out.push({key: 'done:' + out.length, channel: 'SNS', tab: 'sns', priority: '低', score: P['低'], kind: '実施中',
+      fact: '11/18に河本アカウントで新規のX記事を7本作成し、28日間に分けて配信予約',
+      action: 'X記事7本の配信（河本アカウント）。配信ごとの表示・プロフィール経由の流入を確認する'});
+
     return out.sort((a, b) => b.score - a.score);
   }
 });
@@ -106,8 +122,8 @@ const naList = (el) => {
     const p = document.createElement('span'); p.className = 'y-na-pri y-na-' + r.score; p.textContent = r.priority;
     const c = document.createElement('span'); c.className = 'y-pill'; c.textContent = r.channel;
     const a = document.createElement('b'); a.textContent = r.action;
-    top.append(p, c, a);
-    const f = document.createElement('div'); f.className = 'y-sub'; f.textContent = '事実：' + r.fact;
+    if (r.kind) { const k = document.createElement('span'); k.className = 'y-pill p-info'; k.textContent = r.kind; top.append(p, c, k, a); } else top.append(p, c, a);
+    const f = document.createElement('div'); f.className = 'y-sub'; f.textContent = (r.kind ? '背景：' : '事実：') + r.fact;
     li.append(top, f);
     if (r.tab && !ch) { li.classList.add('y-go'); li.tabIndex = 0; li.addEventListener('click', () => window.YGo && window.YGo(r.tab)); }
     el.append(li);
