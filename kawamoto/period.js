@@ -45,8 +45,8 @@ const inP = (p, s) => { const d = String(s || '').slice(0, 10); return d && d >=
 
 dash.calc('pstats', {
   title: '期間別の数字', description: '選べる期間ごとに、商談DB（商談日／成約日）・GA4（日別）・サーチコンソール（日別）・Postiz（投稿日）・PR TIMES（配信日）・公式LINE（日別の累計の差）を集計します。目標は月40件・週10件（着座・商談設定）、月8件・週2件（送客くん・採用くんの成約）。',
-  inputs: ['periods', 'deals_all', 'ga_daily', 'sc_daily', 'sns_posts', 'prtimes', 'line_friends', 'ga_source_daily'],
-  fn: (periods, deals_all, ga_daily, sc_daily, sns_posts, prtimes, line_friends, ga_source_daily) => {
+  inputs: ['periods', 'deals_all', 'ga_daily', 'sc_daily', 'sns_posts', 'prtimes', 'line_friends', 'ga_source_daily', 'report_extra'],
+  fn: (periods, deals_all, ga_daily, sc_daily, sns_posts, prtimes, line_friends, ga_source_daily, report_extra) => {
     const law = deals_all.filter((r) => r.kind === '法人');
     const lf = [...line_friends].sort((a, b) => (a.date < b.date ? -1 : 1));
     const at = (d) => { let v = null; for (const r of lf) { if (r.date <= d) v = r; else break; } return v; };
@@ -54,6 +54,10 @@ dash.calc('pstats', {
     const has = (from, p) => !!from && p.end >= from;
     return periods.map((p) => {
       const m = law.filter((r) => inP(p, r.meeting_at));
+      // 商談設定は定例レポートと同じく、期間内に日程がある商談（今日より後の予定も含む）。先月同日比較用の行だけは同じ日まで
+      const pFull = p.hidden ? p : {...p, end: YD.add(p.start, p.full_days - 1)};
+      const mAll = law.filter((r) => inP(pFull, r.meeting_at));
+      const ex = (report_extra || []).find((x) => x.period === p.id) || {};
       const won = law.filter((r) => r.status === '成約' && inP(p, r.closed_at));
       const g = ga_daily.filter((r) => inP(p, r.date)), s = sc_daily.filter((r) => inP(p, r.date));
       const src = ga_source_daily.filter((r) => inP(p, r.date));
@@ -62,7 +66,7 @@ dash.calc('pstats', {
       const cur = p.end === p.today;
       return {
         period: p.id, label: p.label, kind: p.kind, start: p.start, end: p.end,
-        meetings: m.length, seated: d3.sum(m, (r) => r.seated), lost: m.filter((r) => r.status === '失注').length,
+        meetings: mAll.length, seated: d3.sum(m, (r) => r.seated), lost: m.filter((r) => r.status === '失注').length,
         won: won.length, won25: d3.sum(won, (r) => r.won25),
         target_seated: tm, target_won: tw, pace_seated: cur ? Math.round(tm * p.days / p.full_days) : tm,
         ga_from: gaFrom, ga_partial: !!gaFrom && p.start < gaFrom && p.end >= gaFrom, sc_from: scFrom,
@@ -77,7 +81,7 @@ dash.calc('pstats', {
         pr_cv: has(srcFrom, p) ? d3.sum(src.filter((r) => String(r.source).startsWith('prtimes')), (r) => r.conversions) : null,
         days: p.days, full_days: p.full_days, current: cur && p.kind === 'month' && !p.hidden, ym: p.ym || null, title: p.title,
         line_add: e && b ? e.friends - b.friends : null, line_reach_add: e && b ? e.reach - b.reach : null, line_block_add: e && b ? e.blocks - b.blocks : null,
-        line_total: e ? e.friends : null, line_until: e ? e.date : null
+        line_total: e ? e.friends : null, line_until: e ? e.date : null, ...ex
       };
     });
   }

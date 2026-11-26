@@ -12,6 +12,9 @@ const RM = {
     return all.find((x) => x.period === 'm' + (+r.period.slice(1) + 1)) || null;
   },
   f: (v) => (v == null ? '—' : Y.fmt(v)),
+  amt: (v, label) => { const w = document.createElement('span'); w.className = 'y-amt'; const t = document.createElement('small'); t.textContent = label; const m = document.createElement('b'); m.textContent = RM.man(v); w.append(t, m); return w; },
+  seatv: (n) => { const w = document.createElement('span'); w.className = 'y-amt'; const t = document.createElement('small'); t.textContent = '着座の価値（1件3.5〜5万円）'; const m = document.createElement('b'); m.textContent = n ? `${(Math.round(n * 35) / 10).toLocaleString('ja-JP')}〜${(n * 5).toLocaleString('ja-JP')}万円` : '0円'; w.append(t, m); return w; },
+  man: (v) => (v == null ? '—' : (Math.round(v / 1000) / 10).toLocaleString('ja-JP') + '万円'),
   pct: (a, b) => (b ? Math.round(100 * a / b) : null)
 };
 const R_DRAWS = ['r-months', 'r-title', 'r-lede', 'r-progress', 'r-cards', 'r-trend'];
@@ -73,6 +76,7 @@ dash.draw('r-progress', (el) => {
     const b = document.createElement('b'); b.textContent = RM.f(v);
     const u = document.createElement('span'); u.textContent = `／ 目標 ${tgt}件`;
     big.append(b, u);
+    if (k === 0) big.append(RM.seatv(v)); else if (k === 1 && r.won_amount) big.append(RM.amt(r.won_amount, '今月の契約金額'));
     const rate = RM.pct(v, tgt);
     const bar = document.createElement('div'); bar.className = 'y-bar'; const fill = document.createElement('i'); fill.style.width = Math.min(100, rate || 0) + '%'; bar.append(fill);
     if (r.current) { const mk = document.createElement('em'); mk.style.left = (100 * r.days / r.full_days) + '%'; mk.title = '今日時点の目安'; bar.append(mk); }
@@ -90,7 +94,13 @@ dash.draw('r-progress', (el) => {
     }
     const tags = document.createElement('div'); tags.className = 'y-r-tags';
     rows.forEach(([txt, tone]) => { const t = document.createElement('span'); t.className = 'y-r-tag t-' + tone; t.textContent = txt; tags.append(t); });
-    c.append(l, big, bar, tags); grid.append(c);
+    c.append(l, big, bar, tags);
+    if (k === 1 && r.won_list && r.won_list.length) {
+      const ul = document.createElement('ul'); ul.className = 'y-won';
+      r.won_list.forEach((w) => { const li = document.createElement('li'); const n = document.createElement('b'); n.textContent = w.name; const sv = document.createElement('span'); sv.textContent = w.service + (w.amount ? '・' + w.amount : ''); li.append(n, sv); ul.append(li); });
+      c.append(ul);
+    }
+    grid.append(c);
   });
   el.append(grid);
 });
@@ -105,29 +115,36 @@ const rDelta = (v, p, unit) => {
   return s;
 };
 dash.draw('r-cards', (el) => {
-  const r = RM.cur(); el.replaceChildren(); if (!r) return;
-  const p = RM.prev(r) || {};
+  const r0 = RM.cur(); el.replaceChildren(); if (!r0) return;
+  const sr = (x) => (x && x.seated ? Math.round(1000 * x.won / x.seated) / 10 : null);
+  const r = {...r0, seat_rate: sr(r0)};
+  const p0 = RM.prev(r0); const p = p0 ? {...p0, seat_rate: sr(p0)} : {};
   const cards = [
     ['商談', '着座', 'seated', '件', `商談設定 ${RM.f(r.meetings)}件・失注 ${RM.f(r.lost)}件`, 'navy'],
-    ['商談', '送客くん・採用くんの成約', 'won25', '件', `全成約 ${RM.f(r.won)}件（成約日で数える）`, 'green'],
+    ['商談', '送客くん・採用くんの成約', 'won25', '件', `全成約 ${RM.f(r.won)}件（成約日で数える）` + (r.won_amount ? `・契約金額 計${RM.man(r.won_amount)}` : ''), 'green'],
     ['商談', '商談設定', 'meetings', '件', '商談日がこの月の法人商談', 'navy'],
+    ['商談', '契約金額（成約の合計）', 'won_amount', '万円', r.won_amount ? `採用くん ${RM.man(r.won_amount_saiyo)}・送客くん ${RM.man(r.won_amount_soukyaku)}（成果報酬の契約は含まない）` : 'この月の金額は未集計', 'green', (v) => (v == null ? null : Math.round(v / 10000))],
+    ['商談', '着座→成約率', 'seat_rate', '%', r.seated ? `成約 ${RM.f(r.won)}件 ÷ 着座 ${RM.f(r.seated)}件` + (r.won_amount ? `・着座1件あたり 約${RM.man(r.won_amount / r.seated)}` : '') : '着座なし', 'green'],
     ['HP', 'フォーム送信', 'cv', '件', 'GA4キーイベント（営業・求職者も含む）', 'blue'],
+    ['HP', '有効な問い合わせ', 'valid_inq', '件', r.valid_inq == null ? 'Gmail連携（10/22）前のため未集計' : `送客くん ${RM.f(r.valid_soukyaku)}・新卒の送客 ${RM.f(r.valid_shinsotsu)}・採用くん ${RM.f(r.valid_saiyo)}・FC ${RM.f(r.valid_fc)}（要確認 ${RM.f(r.valid_check)}件は除く）`, 'blue'],
     ['HP', 'HPセッション', 'sessions', '', 'yorisoi-hr.com 全体', 'blue'],
     ['検索', '検索クリック', 'clicks', '回', `表示 ${RM.f(r.impressions)}回`, 'teal'],
     ['SNS', 'SNS経由の流入', 'sns_sessions', 'セッション', `公開投稿 ${RM.f(r.sns_pub)}件・送信 ${RM.f(r.sns_cv)}件`, 'purple'],
     ['PR TIMES', 'PR TIMES経由の流入', 'pr_sessions', 'セッション', `配信 ${RM.f(r.pr)}本・送信 ${RM.f(r.pr_cv)}件`, 'orange'],
     ['公式LINE', '友だち増加', 'line_add', '人', r.line_until ? `ブロック +${RM.f(r.line_block_add)}・${(+r.line_until.slice(5, 7)) + '/' + (+r.line_until.slice(8, 10))}までのデータ` : 'データなし', 'green']
   ];
-  cards.forEach(([ch, name, f, unit, sub, tone]) => {
-    const c = document.createElement('div'); c.className = 'y-pk t-' + tone;
+  cards.forEach(([ch, name, f, unit, sub, tone, conv]) => {
+    const cv = conv || ((v) => v);
+    const c = document.createElement('div'); c.className = 'y-pk t-' + tone + (['seated', 'won25', 'meetings'].includes(f) ? ' y-key' : '');
     const l = document.createElement('div'); l.className = 'y-pk-l'; l.textContent = `${ch}｜${name}`;
     const n = document.createElement('div'); n.className = 'y-pk-v';
-    const b = document.createElement('b'); b.textContent = RM.f(r[f]);
+    const b = document.createElement('b'); b.textContent = RM.f(cv(r[f]));
     const u = document.createElement('span'); u.textContent = unit;
     n.append(b, u);
+    if (f === 'seated' && r.seated != null) n.append(RM.seatv(r.seated)); else if (f === 'won25' && r.won_amount) n.append(RM.amt(r.won_amount, '契約金額'));
     const dl = document.createElement('div'); dl.className = 'y-r-dl';
-    dl.append(rDelta(r[f], p[f], unit === 'セッション' ? '' : unit));
-    const pv = document.createElement('span'); pv.className = 'y-sub'; pv.textContent = p.title ? `${r.current ? '先月同日' : '前月'} ${RM.f(p[f])}` : '';
+    dl.append(rDelta(cv(r[f]), p[f] == null ? null : cv(p[f]), unit === 'セッション' ? '' : unit === '%' ? 'pt' : unit));
+    const pv = document.createElement('span'); pv.className = 'y-sub'; pv.textContent = p.title ? `${r.current ? '先月同日' : '前月'} ${RM.f(p[f] == null ? null : cv(p[f]))}` : '';
     dl.append(pv);
     const s = document.createElement('div'); s.className = 'y-sub'; s.textContent = sub;
     c.append(l, n, dl, s); el.append(c);
@@ -137,7 +154,7 @@ dash.draw('r-cards', (el) => {
 // 月別の推移（表）
 dash.draw('r-trend', (el) => {
   const ms = RM.months(); el.replaceChildren(); if (!ms.length) return;
-  const cols = [['月', null], ['商談設定', 'meetings'], ['着座', 'seated'], ['着座の達成率', 'rate'], ['送客くん・採用くん', 'won25'], ['全成約', 'won'], ['フォーム送信', 'cv'], ['HPセッション', 'sessions'], ['検索クリック', 'clicks'], ['SNS流入', 'sns_sessions'], ['PR配信', 'pr'], ['PR流入', 'pr_sessions'], ['LINE友だち増加', 'line_add']];
+  const cols = [['月', null], ['商談設定', 'meetings'], ['着座', 'seated'], ['着座の達成率', 'rate'], ['送客くん・採用くん', 'won25'], ['全成約', 'won'], ['フォーム送信', 'cv'], ['有効問い合わせ', 'valid_inq'], ['HPセッション', 'sessions'], ['検索クリック', 'clicks'], ['SNS流入', 'sns_sessions'], ['PR配信', 'pr'], ['PR流入', 'pr_sessions'], ['LINE友だち増加', 'line_add']];
   const t = document.createElement('table'); t.className = 'y-table';
   const th = document.createElement('thead'); const hr = document.createElement('tr');
   cols.forEach(([c]) => { const x = document.createElement('th'); x.textContent = c; hr.append(x); });

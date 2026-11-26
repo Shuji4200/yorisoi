@@ -114,6 +114,37 @@ body{padding:16px}
 @media (max-width:520px){.y-pmf-ladder{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 .y-main:has(#pmf:not([hidden])) .y-pbar{display:none}#pmf{--acc:#e5484d}
+</style><style>
+/* 定例レポートと同じ見た目（今月の進捗・チャネル別） */
+.y-r-ph{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.y-r-ph b{font-size:18px}
+.y-r-days{flex:0 1 360px;min-width:220px;font-size:13px;color:#5b606a}
+.y-r-pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.y-r-pc{border:1px solid #e7e9ee;border-radius:16px;padding:16px}
+.y-r-pc .y-bar{margin:12px 0}
+.y-r-pc .y-bar>i{background:#22a06b}
+.y-r-pc .y-bar>em{position:absolute;top:-5px;bottom:-5px;width:2px;background:#16181d;border-radius:1px}
+.y-r-tags,.y-r-dl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.y-r-dl{margin:6px 0 4px}
+.y-r-tag,.y-r-delta{font-size:12px;border-radius:999px;padding:3px 10px;background:#f1f3f6;color:#5b606a;font-weight:700}
+.y-r-tag.t-ok,.y-r-delta.t-up{background:#e6f6ee;color:#167a4f}
+.y-r-tag.t-warn,.y-r-delta.t-down{background:#fdecec;color:#c0392b}
+.y-won li{display:block!important;padding:4px 0}
+.y-won li b{display:block}
+.y-won li span{display:block;text-align:left!important;color:#5b606a;font-size:12px}
+.y-won{list-style:none;margin:12px 0 0;padding:10px 0 0;border-top:1px solid #eef0f3;font-size:13px}
+.y-won li{display:flex;justify-content:space-between;gap:10px;padding:4px 0}
+.y-won li span{color:#5b606a;white-space:nowrap}
+.y-amt{display:inline-flex;flex-direction:column;align-items:flex-start;margin-left:14px;padding:4px 12px;border-left:3px solid #22a06b;background:#f3fbf7;border-radius:8px;vertical-align:bottom;line-height:1.2}
+.y-amt small{font-size:11px;font-weight:700;color:#167a4f}
+.y-amt b{font-size:22px!important;font-weight:800;color:#167a4f}
+.y-pk.y-key,.y-r-pc{background:#fff1f1!important;border-color:#f6c9c6!important}
+.y-pk.y-key{border-left-color:#e5484d!important}
+.y-pk.y-key .y-pk-l{color:#b42318}
+.y-r-pc .y-pk-l{color:#b42318}
+.y-r-pc .y-bar{position:relative;overflow:visible}
+@media (max-width:900px){.y-r-pgrid{grid-template-columns:1fr}}
+.y-r-pc .y-pk-v b{font-size:40px;line-height:1.1}
 </style></head>
 <body>
 <div class="y-snap">2026/11/26 9:30 時点のデータです。商談・成約は【①広報・マーケKPI】シート、HP・検索はGA4・サーチコンソール、SNSはPostizから取得しています。公式LINE・PR TIMES・Wantedlyは11/14時点。Wantedlyの候補者名は伏せています。<a href="report.html" style="color:#b42318;font-weight:700;margin-left:6px">役員向け定例レポートを見る →</a></div>
@@ -354,6 +385,7 @@ body{padding:16px}
   </div>
   <p class="y-lede" data-draw="p-lede"></p>
 
+  <div class="y-card" id="home-progress" data-draw="r-progress" style="margin-bottom:var(--cds-gap-md)"></div>
   <h2 class="y-h2" id="goal">ゴールと現在地<small>選んだ期間の数字（目標：月 着座40・成約8／週 着座10・成約2）</small></h2>
   <div class="y-grid y-goal">
    <div class="y-card"><h3>② 商談：着座</h3>
