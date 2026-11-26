@@ -111,9 +111,9 @@ html,body{margin:0;background:#fff}body{padding:16px}
  <div class="y-asof" id="asof">2026年11月26日 9:30時点の集計です（広報マーケのダッシュボードと同じデータ。有効な問い合わせの分類は11/24 14時まで）。毎週の定例前に最新化します。</div>
  <div class="y-tabs" role="tablist" aria-label="表示する内容">
   <button type="button" role="tab" id="tab-report" aria-controls="panel-report" aria-selected="true">月次レポート</button>
+  <button type="button" role="tab" id="tab-pmf" aria-controls="panel-pmf" aria-selected="false">問い合わせ・PMF</button>
   <button type="button" role="tab" id="tab-training" aria-controls="panel-training" aria-selected="false">林さんの育成・引き継ぎ</button>
   <button type="button" role="tab" id="tab-tc" aria-controls="panel-tc" aria-selected="false">転職.com</button>
-  <button type="button" role="tab" id="tab-pmf" aria-controls="panel-pmf" aria-selected="false">問い合わせ・PMF</button>
  </div>
  <div class="y-panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report">
 
@@ -440,7 +440,7 @@ dash.draw('r-trend', (el) => {
   const items = T.items, done = items.filter(i => i.done).length, chk = items.filter(i => i.checked).length;
 
   // タブ
-  const tabs = [['tab-report','panel-report'],['tab-training','panel-training'],['tab-tc','panel-tc'],['tab-pmf','panel-pmf']];
+  const tabs = [['tab-report','panel-report'],['tab-pmf','panel-pmf'],['tab-training','panel-training'],['tab-tc','panel-tc']];
   const show = (id) => tabs.forEach(([t,p]) => { const on = t === id; $(t).setAttribute('aria-selected', on); $(p).hidden = !on; });
   tabs.forEach(([t]) => $(t).addEventListener('click', () => { show(t); history.replaceState(null,'', t === 'tab-training' ? '#training' : t === 'tab-tc' ? '#tenshoku' : t === 'tab-pmf' ? '#pmf' : '#'); }));
   if (location.hash === '#training') show('tab-training'); if (location.hash === '#tenshoku') show('tab-tc'); if (location.hash === '#pmf') show('tab-pmf');

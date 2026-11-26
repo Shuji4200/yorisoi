@@ -87,7 +87,34 @@ body{padding:16px}
 .y-exec{display:inline-flex;align-items:center;gap:6px;margin:0 10px 6px;padding:10px 14px;border-radius:12px;background:#fff1f1;border:1px solid #f6c9c6;color:#b42318;font-weight:700;font-size:14px;text-decoration:none}
 @media (max-width:1000px){.y-hp-top{grid-template-columns:1fr}.y-hp-site{grid-template-columns:1fr}}
 </style>
-</head>
+<style>
+/* 問い合わせ・PMF */
+.y-main:has(#pmf:not([hidden])) .y-pbar{display:none}
+.y-pmf-hero{background:linear-gradient(135deg,#2f3a5f,#4b5d96)}
+#pmf{--acc:#2f3a5f}
+.y-pmf-verdict{border-radius:18px;padding:18px 22px;background:#eef3ff;border:1px solid #cddcfb;margin-bottom:14px}
+.y-pmf-verdict b{font-size:18px;color:#16181d}.y-pmf-verdict p{margin:6px 0 0;font-size:14px;color:#3a3f48;line-height:1.7}
+.y-pmf-ladder{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:14px}
+.y-pmf-step{position:relative;border:1px solid #e7e9ee;border-radius:16px;padding:14px 12px;background:#fff;min-width:0}
+.y-pmf-step b{display:block;font-size:17px;color:#16181d}.y-pmf-step small{display:block;font-size:11px;color:#8b909a;margin-bottom:6px}
+.y-pmf-step p{margin:0 0 6px;font-size:13px;line-height:1.55;color:#3a3f48}
+.y-pmf-step.done{background:#f3fbf7;border-color:#c5ead6}
+.y-pmf-step.now{background:#eef3ff;border-color:#2f3a5f;box-shadow:0 0 0 2px #2f3a5f inset}
+.y-pmf-step.goal{border-style:dashed;border-color:#22a06b}
+.y-pmf-flag{position:absolute;top:-10px;right:10px;background:#2f3a5f;color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px}
+.y-pmf-flag.g{background:#22a06b}
+.y-pmf-svc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.y-pmf-card h3{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:#16181d;font-weight:800;font-size:16px}
+.y-pmf-card dl{margin:8px 0 0;display:grid;grid-template-columns:72px 1fr;gap:6px 10px;font-size:14px;line-height:1.6}
+.y-pmf-card dt{color:#8b909a;font-weight:700}.y-pmf-card dd{margin:0;color:#16181d}
+.y-pmf-dots{display:flex;gap:4px;margin:4px 0}
+.y-pmf-dots i{width:24px;height:6px;border-radius:3px;background:#e7e9ee}
+.y-pmf-dots i.on{background:#2f3a5f}.y-pmf-dots i.half{background:linear-gradient(90deg,#2f3a5f 50%,#e7e9ee 50%)}
+@media (max-width:1000px){.y-pmf-ladder{grid-template-columns:repeat(3,minmax(0,1fr))}.y-pmf-svc{grid-template-columns:1fr}}
+@media (max-width:520px){.y-pmf-ladder{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.y-main:has(#pmf:not([hidden])) .y-pbar{display:none}#pmf{--acc:#e5484d}
+</style></head>
 <body>
 <div class="y-snap">2026/11/26 9:30 時点のデータです。商談・成約は【①広報・マーケKPI】シート、HP・検索はGA4・サーチコンソール、SNSはPostizから取得しています。公式LINE・PR TIMES・Wantedlyは11/14時点。Wantedlyの候補者名は伏せています。<a href="report.html" style="color:#b42318;font-weight:700;margin-left:6px">役員向け定例レポートを見る →</a></div>
 <style>
@@ -288,6 +315,7 @@ body{padding:16px}
   <button data-tab="home" aria-current="page">🏠 ホーム（施策マップ）</button>
   <button data-tab="actions"><span>✅ ネクストアクション</span><span class="y-badge" data-draw="nb-na"></span></button>
   <button data-tab="report">📅 月別レポート</button>
+  <button data-tab="pmf"><span>🎯 問い合わせ・PMF</span><span class="y-badge" data-draw="nb-pmf"></span></button>
   <div class="y-navlabel">① 法人リード</div>
   <button data-tab="traffic">📈 HP流入・問い合わせ</button>
   <button data-tab="sns">💬 SNS（X・Threads・LinkedIn）</button>
@@ -551,6 +579,59 @@ body{padding:16px}
   </div>
  </section>
 
+ <!-- 問い合わせ・PMF -->
+ <section id="pmf" data-page hidden>
+  <div class="y-r-hero y-pmf-hero">
+   <div class="y-r-kicker">法人リード・事業の段階</div>
+   <h1 class="y-h1">問い合わせ・PMF</h1>
+   <p>HPフォームのお問い合わせ・有効な問い合わせ・大手からの連絡と、YORISOIのサービスがPMFのどの段階にいて、次にどこを目指すかをまとめています。</p>
+  </div>
+
+  <h2 class="y-h2" id="pmf-now">今月のお問い合わせ<small>11/1〜11/24 14時・HPフォーム通知メールを1件ずつ分類</small></h2>
+  <div class="y-pks">
+   <div class="y-pk t-blue"><div class="y-pk-l">お問い合わせ（フォーム送信）</div><div class="y-pk-v"><b data-draw="pmf-k" data-f="mail_form" data-source="inq_month" data-field="mail_form" data-where="month=2026-11">—</b><span>件</span></div><div class="y-sub">営業・求職者なども含む全件</div></div>
+   <div class="y-pk t-green"><div class="y-pk-l">有効な問い合わせ</div><div class="y-pk-v"><b data-draw="pmf-k" data-f="valid" data-source="inq_month" data-field="valid" data-where="month=2026-11">—</b><span>件</span></div><div class="y-sub">送信のうち <span data-draw="pmf-k" data-f="valid_rate" data-source="inq_month" data-field="valid_rate" data-where="month=2026-11">—</span>%・要確認は除く</div></div>
+   <div class="y-pk t-navy"><div class="y-pk-l">うち送客くん</div><div class="y-pk-v"><b data-draw="pmf-k" data-f="soukyaku" data-source="inq_month" data-field="soukyaku" data-where="month=2026-11">—</b><span>件</span></div><div class="y-sub">新卒の送客・採用くん・FCの内訳は下の表</div></div>
+   <div class="y-pk t-purple"><div class="y-pk-l">大手・上場系からの連絡</div><div class="y-pk-v"><b data-draw="pmf-k" data-f="big" data-source="inq_month" data-field="big" data-where="month=2026-11">—</b><span>社</span></div><div class="y-sub">上場企業・そのグループ会社・大手の非上場企業</div></div>
+  </div>
+
+  <h2 class="y-h2" id="pmf-months">月別の問い合わせ<small>フォーム送信はGA4（9/15〜）と通知メール（10/23〜）の両方</small></h2>
+  <div class="y-tablewrap"><table class="y-table" data-source="inq_month" data-row-key="month">
+   <thead><tr><th data-field="label">月</th><th data-field="ga_form">フォーム送信（GA4）</th><th data-field="mail_form">フォーム送信（通知メール）</th><th data-field="valid">有効</th><th data-field="soukyaku">送客くん</th><th data-field="shinsotsu">新卒の送客</th><th data-field="saiyo">採用くん</th><th data-field="fc">FC</th><th data-field="big">大手・上場系</th><th data-field="note">集計の範囲</th></tr></thead>
+   <tbody data-draw="pmf-month-body"></tbody></table></div>
+
+  <div class="y-grid2" style="margin-top:var(--cds-gap-md)">
+   <div class="y-card" id="pmf-big-card"><h3>大手・上場系からの連絡</h3>
+    <div class="y-tablewrap" style="border:0"><table class="y-table" data-source="pmf_big" data-row-key="company">
+     <thead><tr><th data-field="date">受信日</th><th data-field="company">会社</th><th data-field="service">サービス</th><th data-field="basis">区分の根拠</th><th data-field="status">状況</th></tr></thead>
+     <tbody data-draw="pmf-big-body"></tbody></table></div></div>
+   <div class="y-card" id="pmf-new-card"><h3>直近の新着（有効）</h3>
+    <div class="y-tablewrap" style="border:0"><table class="y-table" data-source="pmf_new" data-row-key="company">
+     <thead><tr><th data-field="date">受信</th><th data-field="company">会社</th><th data-field="service">サービス</th><th data-field="memo">内容</th></tr></thead>
+     <tbody data-draw="pmf-new-body"></tbody></table></div></div>
+  </div>
+
+  <h2 class="y-h2" id="pmf-stage">YORISOIはいまPMFのどこにいるか<small>フィットジャーニー（6段階）で判定</small></h2>
+  <div class="y-pmf-verdict"><b>いまは「PMF（検証中）」。次のゴールは PMF の達成と GTM（売れる仕組みづくり）です。</b>
+   <p>送客くん・採用くんはお金を払う顧客が複数いて、サービスとして提供もできている（PSF・SPFは通過）。大手からも自発的な問い合わせが来はじめています。一方で、PMFの判定に必要な「顧客の定着（継続率）」「満足度（NPS・ショーン・エリステスト）」をまだ測っていないため、PMF達成とは言い切れません。段階の判定はClaudeの推測です。</p></div>
+  <div class="y-pmf-ladder" data-draw="pmf-ladder" data-source="pmf_stages"></div>
+  <div class="y-pks" style="margin-top:var(--cds-gap-md)">
+   <div class="y-pk t-navy"><div class="y-pk-l">法人の商談設定（全期間）</div><div class="y-pk-v"><b data-draw="pmf-d" data-f="meetings" data-source="pmf_deals" data-field="meetings" data-row="0">—</b><span>件</span></div><div class="y-sub">Notion商談DB</div></div>
+   <div class="y-pk t-navy"><div class="y-pk-l">着座</div><div class="y-pk-v"><b data-draw="pmf-d" data-f="seated" data-source="pmf_deals" data-field="seated" data-row="0">—</b><span>件</span></div></div>
+   <div class="y-pk t-green"><div class="y-pk-l">成約</div><div class="y-pk-v"><b data-draw="pmf-d" data-f="won" data-source="pmf_deals" data-field="won" data-row="0">—</b><span>件</span></div><div class="y-sub">採用くん <span data-draw="pmf-d" data-f="won_saiyo" data-source="pmf_deals" data-field="won_saiyo" data-row="0">—</span>・送客くん <span data-draw="pmf-d" data-f="won_soukyaku" data-source="pmf_deals" data-field="won_soukyaku" data-row="0">—</span></div></div>
+   <div class="y-pk t-green"><div class="y-pk-l">着座→成約率</div><div class="y-pk-v"><b data-draw="pmf-d" data-f="rate" data-source="pmf_deals" data-field="rate" data-row="0">—</b><span>%</span></div></div>
+   <div class="y-pk t-orange"><div class="y-pk-l">2回以上成約した会社（定着の目安）</div><div class="y-pk-v"><b data-draw="pmf-d" data-f="repeat" data-source="pmf_deals" data-field="repeat" data-row="0">—</b><span>社</span></div><div class="y-sub">継続・追加発注はまだ記録していない</div></div>
+  </div>
+
+  <h2 class="y-h2" id="pmf-svc-h">サービス別の段階</h2>
+  <div class="y-pmf-svc" data-draw="pmf-svc" data-source="pmf_services"></div>
+
+  <h2 class="y-h2" id="pmf-next-h">次にやること（PMF達成 → GTM へ）<small>広報マーケで進める順</small></h2>
+  <div class="y-card"><ul class="y-nalist" data-draw="pmf-next" data-source="pmf_next"></ul></div>
+  <div class="y-note">出典：HPフォーム通知メール（Gmail・HomuPa!）を1件ずつ分類、GA4のフォーム送信（月別）、Notion商談DB（法人）。大手・上場系の区分は各社の公開情報で確認。段階の判定と次にやることはClaudeの推測・提案です。問い合わせの分類はClaudeに「問い合わせを更新」と頼むと最新にします。</div>
+ </section>
+
+
  <section id="report" data-page hidden>
   <div class="y-r-hero">
    <div class="y-r-kicker">YORISOI 広報・マーケ</div>
@@ -775,6 +856,7 @@ body{padding:16px}
 <script src="training.js"></script>
 <script src="hp.js"></script>
 <script src="tc.js"></script>
+<script src="pmf.js"></script>
 <script>dash.drawAll();</script>
 </body>
 </html>
