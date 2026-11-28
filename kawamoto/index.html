@@ -46,7 +46,7 @@ body{padding:16px}
 .y-table tr.y-go{cursor:pointer}
 .y-table tr.y-r-sel td{background:#eef7f2;font-weight:700}
 @media (max-width:900px){.y-r-pgrid{grid-template-columns:1fr}}
-/* ⑥ 社内教育・育成 */
+
 .y-t-hero{background:linear-gradient(135deg,#5b4bd6,#8b7cf6)}
 .y-t-program{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .y-t-phase{padding:18px 20px}
@@ -367,8 +367,6 @@ body{padding:16px}
   <button data-tab="activities">🗂️ 施策の実施履歴</button>
   <button data-tab="analysis">📊 分析レポート</button>
   <button data-tab="weekly">🗓️ 週次定例</button>
-  <div class="y-navlabel">⑥ 社内教育・育成</div>
-  <button data-tab="training">🎓 育成・引き継ぎ（林さん）</button>
  </nav>
 
  <div class="y-main">
@@ -435,37 +433,12 @@ body{padding:16px}
    </div>
   </div>
 
-  <h2 class="y-h2" id="map">施策マップ<small>6軸・27施策の今月の数字（クリックで詳細タブへ・「未計測」はデータ未接続）</small></h2>
+  <h2 class="y-h2" id="map">施策マップ<small>5軸・24施策の今月の数字（クリックで詳細タブへ・「未計測」はデータ未接続）</small></h2>
   <div class="y-axes" data-draw="imap"></div>
  </section>
 
 
- <!-- ⑥ 社内教育・育成 -->
- <section id="training" data-page hidden>
-  <div class="y-r-hero y-t-hero">
-   <div class="y-r-kicker">⑥ 社内教育・育成</div>
-   <h1 class="y-h1">育成・引き継ぎ（林さん）</h1>
-   <p>広報マーケ新人の林さんの30日プログラム、2〜5ヶ月目の育て方、立ち上がりの目標と実績、引き継ぐ業務をまとめています。内容はNotionの採用・育成計画からです。</p>
-  </div>
-  <div class="y-pks" data-draw="t-status"></div>
-  <h2 class="y-h2">30日の教育プログラム<small>業務をしながら育て、30日で独り立ち</small></h2>
-  <div class="y-t-program" data-draw="t-program"></div>
-  <h2 class="y-h2">評価ゲート</h2>
-  <div data-draw="t-gates"></div>
-  <h2 class="y-h2">立ち上がりの目標と実績<small>担当チャネル経由の法人商談は商談DBの担当＝林で自動集計</small></h2>
-  <div data-draw="t-ramp"></div>
-  <h2 class="y-h2">2〜5ヶ月目の成長プラン<small>勉強会のテーマと任せる業務</small></h2>
-  <div data-draw="t-months"></div>
-  <div class="y-grid2" style="margin-top:var(--cds-gap-md)">
-   <div class="y-card"><h3>会議体・日々のサイクル</h3><div data-draw="t-routine"></div></div>
-   <div class="y-card"><h3>行動KPI（週）</h3><div data-draw="t-kpi"></div></div>
-  </div>
-  <h2 class="y-h2">引き継ぐ業務の分担</h2>
-  <div data-draw="t-handover"></div>
-  <h2 class="y-h2">関連資料</h2>
-  <div class="y-t-links" data-draw="t-links"></div>
-  <div class="y-note">出典：Notion「広報マーケ新人の採用・育成計画と売上貢献試算」（2026/11/1提出）。金額・報酬は載せていません。LINE登録の実績と日報・勉強会の記録はまだデータ未接続です。</div>
- </section>
+ 
 
  <!-- 月別レポート -->
  <!-- ④ 転職.com SNS -->
@@ -887,7 +860,6 @@ body{padding:16px}
 <script src="ux.js?v=1126f"></script>
 <script src="period.js?v=1126f"></script>
 <script src="report.js?v=1126f"></script>
-<script src="training.js?v=1126f"></script>
 <script src="hp.js?v=1126f"></script>
 <script src="tc.js?v=1126f"></script>
 <script src="pmf.js?v=1126f"></script>
